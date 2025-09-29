@@ -2,5 +2,7 @@
   <input type="file" accept=".txt" (change)="onFileSelected($event)" />
   <button (click)="onShuffle()" [disabled]="count === 0">Shuffle</button>
   <button (click)="onSpin()" [disabled]="count === 0">Spin</button>
+  <button (click)="onClear()" [disabled]="count === 0">Clear</button>
+
   @if (count) { <span class="count">Loaded: {{ count | number }}</span> }
 </div>

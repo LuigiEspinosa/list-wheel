@@ -30,4 +30,8 @@ export class EntryService {
 
     this.entries.set(arr);
   }
+
+  clear() {
+    this.entries.set([])
+  }
 }

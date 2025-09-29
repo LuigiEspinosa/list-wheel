@@ -23,6 +23,8 @@ export class WheelCanvasComponent {
   constructor() {
     effect(() => {
       this.svc.entries();
+      this.stop();
+      this.winner = null;
       this.angle = 0;
       queueMicrotask(() => this.draw());
     });
@@ -37,6 +39,7 @@ export class WheelCanvasComponent {
   }
 
   ngOnDestroy() {
+    this.stop();
     this.cleanup?.();
   }
 
@@ -71,6 +74,13 @@ export class WheelCanvasComponent {
     }
 
     this.rafId = requestAnimationFrame((n) => tick(n, start));
+  }
+
+  private stop() {
+    if (this.rafId != null) cancelAnimationFrame(this.rafId);
+    this.rafId = null;
+    this.spinning = false;
+    this.angularVelocity = 0;
   }
 
   private resizeAndDraw() {

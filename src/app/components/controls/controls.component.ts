@@ -33,6 +33,10 @@ export class ControlsComponent {
     }
   }
 
+  onClear() {
+    this.svc.clear();
+  }
+
   get count() {
     return this.svc.entries().length;
   }
