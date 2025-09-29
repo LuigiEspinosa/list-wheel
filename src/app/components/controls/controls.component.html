@@ -1,4 +1,5 @@
 <div class="controls" role="region" aria-label="Controls">
   <input type="file" accept=".txt" (change)="onFileSelected($event)" />
+  <button (click)="onSpin()" [disabled]="count === 0">Spin</button>
   @if (count) { <span class="count">Loaded: {{ count | number }}</span> }
 </div>

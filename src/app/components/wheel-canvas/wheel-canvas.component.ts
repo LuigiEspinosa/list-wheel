@@ -13,15 +13,64 @@ export class WheelCanvasComponent {
   @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
 
   private angle = 0;
+  private angularVelocity = 0;
+  private rafId: number | null = null;
+  private spinning = false;
+  winner: string | null = null;
+
+  private cleanup?: () => void;
 
   constructor() {
     effect(() => {
       this.svc.entries();
-    })
+      this.angle = 0;
+      queueMicrotask(() => this.draw());
+    });
+
+    const onResize = () => this.resizeAndDraw();
+    window.addEventListener('resize', onResize);
+    this.cleanup = () => window.removeEventListener('resize', onResize)
   }
 
   ngAfterViewInit() {
     this.resizeAndDraw();
+  }
+
+  ngOnDestroy() {
+    this.cleanup?.();
+  }
+
+  spin() {
+    if (this.spinning || this.svc.entries().length === 0) return;
+    const turns = 4 + Math.random() * 4;
+    const spinDuration = 4 + Math.random() * 1.2;
+    this.angularVelocity = (turns * 2 * Math.PI) / spinDuration;
+    this.spinning = true;
+    this.winner = null;
+    this.animate();
+  }
+
+  private animate() {
+    const friction = 0.995;
+    const start = performance.now();
+
+    const tick = (now: number, last: number) => {
+      const dt = (now - last) / 1000;
+      this.angle = (this.angle + this.angularVelocity * dt) % (2 * Math.PI);
+      this.angularVelocity *= Math.pow(friction, dt * 60);
+      this.draw();
+
+      if (this.angularVelocity < 0.2) {
+        this.spinning = false;
+        this.angularVelocity = 0;
+        this.snapAndPickWinner();
+        return;
+      }
+
+      this.rafId = requestAnimationFrame((n) => tick(n, now));
+    }
+
+    this.rafId = requestAnimationFrame((n) => tick(n, start));
   }
 
   private resizeAndDraw() {
@@ -53,9 +102,9 @@ export class WheelCanvasComponent {
 
     ctx.save();
     ctx.translate(cx, cy);
-    ctx.rotate(this.angle)
+    ctx.rotate(this.angle);
 
-    const n = this.svc.entries().length || 2;
+    const n = this.svc.entries().length || 1;
     const step = (2 * Math.PI) / n;
 
     const k = Math.max(1, Math.floor(n / 360));
@@ -93,10 +142,52 @@ export class WheelCanvasComponent {
 
     ctx.fillStyle = '#ff3b30';
     ctx.beginPath();
-    ctx.moveTo(cx, cy - radius - 4);
-    ctx.lineTo(cx - 12, cy - radius + 20);
-    ctx.lineTo(cx + 12, cy - radius + 20);
+    ctx.moveTo(cx, cy - radius + 18);
+    ctx.lineTo(cx - 12, cy - radius - 10);
+    ctx.lineTo(cx + 12, cy - radius - 10);
     ctx.closePath();
     ctx.fill();
+
+
+    if (this.winner) {
+      ctx.fillStyle = '#111';
+      ctx.font = '700 20px system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      this.fitText(ctx, this.winner, cx, cy, radius * 1.4);
+    }
+  }
+
+  private fitText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number) {
+    let size = 22;
+    ctx.font = `700 ${size}px system-ui, sans-serif`;
+
+    while (ctx.measureText(text).width > maxWidth && size > 10) {
+      size -= 1;
+      ctx.font = `700 ${size}px system-ui sans-serif`;
+    }
+
+    ctx.fillText(text, x, y);
+  }
+
+  private snapAndPickWinner() {
+    const n = this.svc.entries().length;
+    if (n === 0) return;
+
+    const step = (2 * Math.PI) / n;
+
+    let pointerAngle = (-this.angle - Math.PI / 2) % (2 * Math.PI);
+    if (pointerAngle < 0) pointerAngle += 2 * Math.PI;
+
+    const idx = Math.floor(pointerAngle / step) % n;
+    this.winner = this.svc.entries()[idx] ?? null;
+
+    const centerOfIdx = (idx + 0.5) * step;
+    const targetWheelAngle = -(centerOfIdx + Math.PI / 2);
+    this.angle = targetWheelAngle;
+    this.draw();
+
+    // Test for Screen Readers
+    const live = document.getElementById('winner-live');
+    if (live) live.textContent = `Winner: ${this.winner}`;
   }
 }

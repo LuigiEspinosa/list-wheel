@@ -5,7 +5,7 @@
   </header>
 
   <section class="panel">
-    <app-controls></app-controls>
+    <app-controls (spin)="onSpinRequested()"></app-controls>
     <div id="winner-live" aria-live="polite" class="sr-only"></div>
   </section>
 

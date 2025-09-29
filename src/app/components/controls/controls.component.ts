@@ -23,6 +23,12 @@ export class ControlsComponent {
     input.value = '';
   }
 
+  onSpin() {
+    if (this.svc.hasEntries()) {
+      this.spin.emit();
+    }
+  }
+
   get count() {
     return this.svc.entries().length;
   }

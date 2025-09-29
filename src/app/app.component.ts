@@ -12,4 +12,8 @@ import { WheelCanvasComponent } from "./components/wheel-canvas/wheel-canvas.com
 
 export class AppComponent {
   @ViewChild(WheelCanvasComponent) wheel!: WheelCanvasComponent;
+
+  onSpinRequested() {
+    this.wheel?.spin();
+  }
 }
