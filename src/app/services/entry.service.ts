@@ -5,6 +5,7 @@ import { computed, Injectable, signal } from "@angular/core";
 export class EntryService {
   readonly entries = signal<string[]>([]);
   readonly hasEntries = computed(() => this.entries().length > 0);
+  readonly lastWinner = signal<string | null>(null);
 
   loadFromText(raw: string) {
     const lines = raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
@@ -33,5 +34,17 @@ export class EntryService {
 
   clear() {
     this.entries.set([])
+  }
+
+  async copyWinner(): Promise<boolean> {
+    const text = this.lastWinner();
+    if (!text) return false;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }

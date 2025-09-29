@@ -7,6 +7,11 @@
 .count {
   opacity: 0.7;
 }
+.toast {
+  color: #0a7;
+  font-weight: 600;
+}
+
 button {
   padding: 0.5rem 0.9rem;
   border-radius: 0.5rem;

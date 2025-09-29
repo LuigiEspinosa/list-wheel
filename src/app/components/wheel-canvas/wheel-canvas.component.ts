@@ -190,6 +190,7 @@ export class WheelCanvasComponent {
 
     const idx = Math.floor(pointerAngle / step) % n;
     this.winner = this.svc.entries()[idx] ?? null;
+    this.svc.lastWinner.set(this.winner);
 
     const centerOfIdx = (idx + 0.5) * step;
     const targetWheelAngle = -(centerOfIdx + Math.PI / 2);

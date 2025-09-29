@@ -4,5 +4,9 @@
   <button (click)="onSpin()" [disabled]="count === 0">Spin</button>
   <button (click)="onClear()" [disabled]="count === 0">Clear</button>
 
+  <button (click)="onCopyWinner()" [disabled]="!winner">Copy Winner</button>
+  @if (winner) { <span>Winner: <strong>{{ winner }}</strong></span> }
+  @if (copied) { <span class="toast">Copied!</span> }
+
   @if (count) { <span class="count">Loaded: {{ count | number }}</span> }
 </div>

@@ -14,6 +14,8 @@ export class ControlsComponent {
   private svc = inject(EntryService);
   @Output() spin = new EventEmitter<void>();
 
+  copied = false;
+
   onFileSelected(ev: Event) {
     const input = ev.target as HTMLInputElement;
     const file = input.files?.[0];
@@ -37,7 +39,17 @@ export class ControlsComponent {
     this.svc.clear();
   }
 
+  async onCopyWinner() {
+    const ok = await this.svc.copyWinner();
+    this.copied = ok;
+    setTimeout(() => (this.copied = false), 1500);
+  }
+
   get count() {
     return this.svc.entries().length;
+  }
+
+  get winner() {
+    return this.svc.lastWinner();
   }
 }
