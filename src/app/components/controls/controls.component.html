@@ -9,4 +9,31 @@
   @if (copied) { <span class="toast">Copied!</span> }
 
   @if (count) { <span class="count">Loaded: {{ count | number }}</span> }
+
+  <button (click)="toggleHistory()" [disabled]="history.length === 0">
+    {{ showHistory ? 'Hide' : 'Show' }} history {{ history.length }}
+  </button>
 </div>
+
+@if (showHistory) {
+<div class="history">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Winner</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (r of history; track r; let i = $index) {
+      <tr>
+        <td>{{ r.order }}</td>
+        <td>{{ r.text }}</td>
+        <td>{{ r.timestamp | date:'medium' }}</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>
+}

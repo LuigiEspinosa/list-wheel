@@ -1,11 +1,11 @@
 import { Component, EventEmitter, inject, Output } from "@angular/core";
 import { EntryService } from "../../services/entry.service";
-import { DecimalPipe } from "@angular/common";
+import { DatePipe, DecimalPipe } from "@angular/common";
 
 @Component({
   selector: 'app-controls',
   standalone: true,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, DatePipe],
   templateUrl: './controls.component.html',
   styleUrls: ['./controls.component.css']
 })
@@ -15,6 +15,7 @@ export class ControlsComponent {
   @Output() spin = new EventEmitter<void>();
 
   copied = false;
+  showHistory = false;
 
   onFileSelected(ev: Event) {
     const input = ev.target as HTMLInputElement;
@@ -40,9 +41,13 @@ export class ControlsComponent {
   }
 
   async onCopyWinner() {
-    const ok = await this.svc.copyWinner();
+    const ok = await this.svc.copyWinnerAndRemove();
     this.copied = ok;
     setTimeout(() => (this.copied = false), 1500);
+  }
+
+  toggleHistory() {
+    this.showHistory = !this.showHistory;
   }
 
   get count() {
@@ -51,5 +56,9 @@ export class ControlsComponent {
 
   get winner() {
     return this.svc.lastWinner();
+  }
+
+  get history() {
+    return this.svc.history();
   }
 }
