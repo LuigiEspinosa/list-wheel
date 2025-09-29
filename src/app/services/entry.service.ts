@@ -18,4 +18,16 @@ export class EntryService {
 
     this.entries.set(unique);
   }
+
+  shuffle() {
+    const arr = this.entries().slice();
+
+    for (let i = arr.length - 1; i > 0; i--) {
+      const r = crypto.getRandomValues(new Uint32Array(i))[0] / 2 ** 32;
+      const j = Math.floor(r * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+
+    this.entries.set(arr);
+  }
 }

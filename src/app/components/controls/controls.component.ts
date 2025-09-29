@@ -23,6 +23,10 @@ export class ControlsComponent {
     input.value = '';
   }
 
+  onShuffle() {
+    this.svc.shuffle();
+  }
+
   onSpin() {
     if (this.svc.hasEntries()) {
       this.spin.emit();
