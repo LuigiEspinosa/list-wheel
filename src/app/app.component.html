@@ -1,0 +1,15 @@
+<main class="layout">
+  <header class="header">
+    <h1>Angular Wheel</h1>
+    <p>Load a .txt file (one entry per line), shuffle, and spin.</p>
+  </header>
+
+  <section class="panel">
+    <app-controls></app-controls>
+    <div id="winner-live" aria-live="polite" class="sr-only"></div>
+  </section>
+
+  <section class="wheel-wrap">
+    <app-wheel-canvas></app-wheel-canvas>
+  </section>
+</main>

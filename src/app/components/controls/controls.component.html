@@ -1,0 +1,4 @@
+<div class="controls" role="region" aria-label="Controls">
+  <input type="file" accept=".txt" (change)="onFileSelected($event)" />
+  @if (count) { <span class="count">Loaded: {{ count | number }}</span> }
+</div>
