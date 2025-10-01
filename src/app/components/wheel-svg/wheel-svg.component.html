@@ -1,0 +1,38 @@
+<div class="wheel-wrap">
+  <svg class="wheel" viewBox="-50 -50 100 100" role="img" aria-label="Wheel of entries">
+    <g [attr.transform]="'rotate(' + angleDeg() + ')'">
+      <circle r="48" fill="#f6f6f6"></circle>
+      <circle r="40" fill="#ffffff"></circle>
+
+      <g stroke="#e5e5e5" stroke-width="0.2">
+        @for (i of labelIndices(); track i; let idx = $index) {
+        <line [attr.x1]="0" [attr.y1]="0" [attr.x2]="48 * Math.cos(i * step())" [attr.y2]="48 * Math.sin(i * step())" />
+        }
+      </g>
+
+      <circle r="48" fill="none" stroke="#333" stroke-width="0.8"></circle>
+
+      <g fill="#222" font-family="system-ui, sans-serif" dominant-baseline="middle">
+        @for (i of labelIndices(); track i; let idx = $index) {
+        <g [attr.transform]="'rotate(' + ((i + 0.5) * step() * 180/Math.PI) + ') translate(' + rStart + ' 0)'">
+          <text text-anchor="start" [attr.font-size]="labelFontSize(step())">
+            {{ radialLabel(i) }}
+          </text>
+        </g>
+        }
+      </g>
+    </g>
+
+    <polygon points="-3,-49 0,-44 3,-49" fill="#ff3b30" />
+    <circle r="3" fill="#333"></circle>
+
+    @if (svc.lastWinner()) {
+    <g fill="#111" text-anchor="middle">
+      <text x="0" y="6" font-size="4.2" font-weight="700">
+        {{ svc.lastWinner() }}
+      </text>
+      <text x="0" y="1" font-size="3" font-weight="600">Winner</text>
+    </g>
+    }
+  </svg>
+</div>

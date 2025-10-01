@@ -30,15 +30,25 @@ export class EntryService {
     this.lastWinner.set(null);
   }
 
+  mulberry32(seed: number) {
+    return function () {
+      let t = (seed += 0x6D2B79F5);
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
   shuffle() {
     const arr = this.entries().slice();
+    const seedBuf = new Uint32Array(1);
+    crypto.getRandomValues(seedBuf);
+    const rand = this.mulberry32(seedBuf[0] ^ Date.now());
 
     for (let i = arr.length - 1; i > 0; i--) {
-      const r = crypto.getRandomValues(new Uint32Array(i))[0] / 2 ** 32;
-      const j = Math.floor(r * (i + 1));
+      const j = Math.floor(rand() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
-
     this.entries.set(arr);
   }
 
