@@ -13,8 +13,24 @@ export class EntryService {
   readonly hasEntries = computed(() => this.entries().length > 0);
   readonly lastWinner = signal<string | null>(null);
   readonly history = signal<WinnerRecord[]>([]);
+  readonly supportsFileSystemAccess = 'showOpenFilePicker' in window;
 
   private winCounter = 0;
+  private fileHandle = signal<FileSystemFileHandle | null>(null);
+
+  readonly hasFileHandle = computed(() => this.fileHandle() !== null);
+
+  readonly isWinnerUrl = computed(() => {
+    const w = this.lastWinner();
+    if (!w) return false;
+
+    try {
+      const url = new URL(w);
+      return url.protocol === 'http:' || url.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  });
 
   loadFromText(raw: string) {
     const lines = raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
@@ -108,6 +124,55 @@ export class EntryService {
 
     this.history.update(h => [rec, ...h]);
     this.lastWinner.set(null);
+    await this.syncToFile();
     return true;
+  }
+
+  async openFile(): Promise<void> {
+    const [handle] = await window.showOpenFilePicker({
+      types: [{ description: 'Text files', accept: { 'text/plain': ['.txt'] } }],
+      multiple: false,
+    });
+
+    this.fileHandle.set(handle);
+    const file = await handle.getFile();
+    this.loadFromText(await file.text());
+  }
+
+  private async syncToFile(): Promise<void> {
+    const handle = this.fileHandle();
+    if (!handle) return;
+    const writable = await handle.createWritable();
+    await writable.write(this.entries().join('\n'));
+    await writable.close();
+  }
+
+  openWinnerInTab(): void {
+    const w = this.lastWinner();
+    if (!w) return;
+    window.open(w, '_blank', 'noopener,noreferrer');
+  }
+
+  searchWinnerOnGoogle(): void {
+    const w = this.lastWinner();
+    if (!w) return;
+    window.open(
+      `https://www.google.com/search?q=${encodeURIComponent(w)}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
+  }
+
+  removeWinner(): void {
+    const w = this.lastWinner();
+    if (!w) return;
+    const arr = this.entries().slice();
+    const idx = arr.indexOf(w);
+    if (idx >= 0) arr.splice(idx, 1);
+    this.entries.set(arr);
+    this.winCounter += 1;
+    this.history.update(h => [{ text: w, timestamp: Date.now(), order: this.winCounter }, ...h]);
+    this.lastWinner.set(null);
+    this.syncToFile().catch(() => { });
   }
 }
