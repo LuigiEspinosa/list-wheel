@@ -71,11 +71,11 @@ describe('WheelSvgComponent', () => {
       expect(comp.labelMaxChars(0.5)).toBeGreaterThanOrEqual(4);
     });
 
-    it('grows with a larger step angle', () => {
-      const dense = comp.labelMaxChars(0.01);
-      const sparse = comp.labelMaxChars(0.3);
-      expect(sparse).toBeGreaterThanOrEqual(dense);
-    });
+    it('fits fewer characters per label when the font is larger (sparse wheel)', () => {
+      const smallStep = comp.labelMaxChars(0.01); // small font -> more chars
+      const largeStep = comp.labelMaxChars(0.3);  // large font -> fewer chars
+      expect(smallStep).toBeGreaterThanOrEqual(largeStep);
+    })
   });
 
   // ---- computed: n, step, angleDeg ----
@@ -163,9 +163,19 @@ describe('WheelSvgComponent', () => {
   // ---- spin ----
 
   describe('spin()', () => {
-    it('does nothing when no entries are loaded', () => {
+    it('spins with a single-slot wheel when no entries are loaded', () => {
       comp.spin();
-      expect(comp.spinning()).toBeFalse();
+      expect(comp.spinning()).toBeTrue();
+      comp['stop']();
+    });
+
+    it('does nothing if already spinning', () => {
+      svc.loadFromText('Alice\nBob');
+      comp.spin();
+      const velocityAfterFirst = comp['angularVelocity'];
+      comp.spin();
+      expect(comp['angularVelocity']).toBe(velocityAfterFirst);
+      comp['stop']();
     });
 
     it('sets spinning to true when entries are loaded', () => {

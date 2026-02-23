@@ -11,6 +11,13 @@
 
   <button (click)="onCopyWinner()" [disabled]="!winner">Copy</button>
 
+  <button (click)="toggleHistory()" [disabled]="history.length === 0">
+    {{ showHistory ? 'Hide' : 'Show' }} history {{ history.length }}
+  </button>
+
+  @if (copied) { <span class="toast">Copied!</span> }
+  @if (count) { <span class="count">Loaded: {{ count | number }}</span> }
+
   @if (winner) {
   <span>Winner: <strong>{{ winner }}</strong></span>
   @if (isWinnerUrl) {
@@ -20,13 +27,6 @@
   }
   <button (click)="onRemoveWinner()">Remove</button>
   }
-
-  @if (copied) { <span class="toast">Copied!</span> }
-  @if (count) { <span class="count">Loaded: {{ count | number }}</span> }
-
-  <button (click)="toggleHistory()" [disabled]="history.length === 0">
-    {{ showHistory ? 'Hide' : 'Show' }} history {{ history.length }}
-  </button>
 </div>
 
 @if (showHistory) {
