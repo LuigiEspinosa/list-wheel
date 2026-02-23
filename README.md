@@ -60,8 +60,6 @@ sequenceDiagram
     Svc->>Svc: history.update()
 ```
 
-![ListWheel: System Architecture](https://raw.githubusercontent.com/LuigiEspinosa/list-wheel/main/public/images/excalidraw-architecture.png)
-
 ## Tech stack
 
 | Concern        | Solution                                        |
