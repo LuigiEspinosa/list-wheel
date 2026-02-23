@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test --no-watch"
+    "test": "ng test --no-watch",
+    "deploy": "ng build --base-href /list-wheel/ && npx angular-cli-ghpages --dir=dist/list-wheel/browser"
   },
   "prettier": {
     "printWidth": 100,
