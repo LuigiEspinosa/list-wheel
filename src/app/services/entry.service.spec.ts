@@ -127,32 +127,58 @@ describe('EntryService', () => {
 
   // ---- isWinnerUrl ----
 
+  describe('winnerUrls', () => {
+    it('returns empty array when no winner', () => {
+      expect(svc.winnerUrls()).toEqual([]);
+    });
+
+    it('returns the URL when winner is a plain URL', () => {
+      svc.lastWinner.set('https://example.com');
+      expect(svc.winnerUrls()).toEqual(['https://example.com']);
+    });
+
+    it('extracts URL from text with pipe separator', () => {
+      svc.lastWinner.set('https://example.com | Example Website');
+      expect(svc.winnerUrls()).toEqual(['https://example.com']);
+    });
+
+    it('extracts multiple URLs when more than one is present', () => {
+      svc.lastWinner.set('https://one.com https://two.com extra text');
+      expect(svc.winnerUrls()).toEqual(['https://one.com', 'https://two.com']);
+    });
+
+    it('returns empty array for plain text', () => {
+      svc.lastWinner.set('Alice from accounting');
+      expect(svc.winnerUrls()).toEqual([]);
+    });
+
+    it('ignores ftp and other non-http protocols', () => {
+      svc.lastWinner.set('ftp://files.example.com | files');
+      expect(svc.winnerUrls()).toEqual([]);
+    });
+  });
+
   describe('isWinnerUrl', () => {
     it('is false when no winner', () => {
       expect(svc.isWinnerUrl()).toBeFalse();
     });
 
-    it('returns true for http URL', () => {
-      svc.lastWinner.set('http://example.com');
+    it('is true when winner is a plain URL', () => {
+      svc.lastWinner.set('https://example.com');
       expect(svc.isWinnerUrl()).toBeTrue();
     });
 
-    it('returns true for https URL with path and query', () => {
-      svc.lastWinner.set('https://example.com/page?q=1#hash');
+    it('is true when winner text contains a URL', () => {
+      svc.lastWinner.set('https://music.apple.com/artist/123 | Artist on Apple Music');
       expect(svc.isWinnerUrl()).toBeTrue();
     });
 
-    it('returns false for plain text', () => {
+    it('is false for plain text with no URL', () => {
       svc.lastWinner.set('Alice from accounting');
       expect(svc.isWinnerUrl()).toBeFalse();
     });
 
-    it('returns false for ftp protocol', () => {
-      svc.lastWinner.set('ftp://files.example.com');
-      expect(svc.isWinnerUrl()).toBeFalse();
-    });
-
-    it('returns false for javascript protocol', () => {
+    it('is false for javascript protocol', () => {
       svc.lastWinner.set('javascript:alert(1)');
       expect(svc.isWinnerUrl()).toBeFalse();
     });
@@ -278,29 +304,17 @@ describe('EntryService', () => {
     });
   });
 
-  // ---- openWinnerInTab ----
+  // ---- openInTab ----
 
-  describe('openWinnerInTab', () => {
-    it('opens winner URL in a new tab', () => {
+  describe('openInTab', () => {
+    it('opens the given URL in a new tab', () => {
       spyOn(window, 'open');
-      svc.lastWinner.set('https://example.com');
-      svc.openWinnerInTab();
-      expect(window.open).toHaveBeenCalledWith('https://example.com', '_blank', 'noopener,noreferrer');
-    });
-
-    it('does not open when no winner', () => {
-      spyOn(window, 'open');
-      svc.openWinnerInTab();
-      expect(window.open).not.toHaveBeenCalled();
-    });
-
-    it('does not remove the entry', () => {
-      spyOn(window, 'open');
-      svc.loadFromText('https://example.com');
-      svc.lastWinner.set('https://example.com');
-      svc.openWinnerInTab();
-      expect(svc.entries()).toEqual(['https://example.com']);
-      expect(svc.lastWinner()).toBe('https://example.com');
+      svc.openInTab('https://example.com');
+      expect(window.open).toHaveBeenCalledWith(
+        'https://example.com',
+        '_blank',
+        'noopener,noreferrer'
+      );
     });
   });
 

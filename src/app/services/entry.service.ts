@@ -19,17 +19,19 @@ export class EntryService {
   private fileHandle = signal<FileSystemFileHandle | null>(null);
 
   readonly hasFileHandle = computed(() => this.fileHandle() !== null);
+  readonly isWinnerUrl = computed(() => this.winnerUrls().length > 0);
 
-  readonly isWinnerUrl = computed(() => {
+  readonly winnerUrls = computed(() => {
     const w = this.lastWinner();
-    if (!w) return false;
-
-    try {
-      const url = new URL(w);
-      return url.protocol === 'http:' || url.protocol === 'https:';
-    } catch {
-      return false;
-    }
+    if (!w) return [];
+    return w.split(/\s+/).filter(token => {
+      try {
+        const url = new URL(token);
+        return url.protocol === 'http:' || url.protocol === 'https:';
+      } catch {
+        return false;
+      }
+    });
   });
 
   loadFromText(raw: string) {
@@ -147,10 +149,8 @@ export class EntryService {
     await writable.close();
   }
 
-  openWinnerInTab(): void {
-    const w = this.lastWinner();
-    if (!w) return;
-    window.open(w, '_blank', 'noopener,noreferrer');
+  openInTab(url: string): void {
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
   searchWinnerOnGoogle(): void {

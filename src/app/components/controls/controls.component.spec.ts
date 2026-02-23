@@ -165,12 +165,12 @@ describe('ControlsComponent', () => {
   // ---- onOpenInTab ----
 
   describe('onOpenInTab', () => {
-    it('delegates to svc.openWinnerInTab()', () => {
-      spyOn(svc, 'openWinnerInTab');
-      comp.onOpenInTab();
-      expect(svc.openWinnerInTab).toHaveBeenCalled();
+    it('delegates to svc.openInTab() with the given URL', () => {
+      spyOn(svc, 'openInTab');
+      comp.onOpenInTab('https://example.com');
+      expect(svc.openInTab).toHaveBeenCalledWith('https://example.com');
     });
-  });
+  })
 
   // ---- onSearchGoogle ----
 

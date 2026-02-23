@@ -23,7 +23,11 @@
       @if (winner) {
       <button (click)="onCopyWinner()">Copy</button>
       @if (isWinnerUrl) {
-      <button (click)="onOpenInTab()">Open in tab</button>
+      @for (url of winnerUrls; track url; let i = $index) {
+      <button (click)="onOpenInTab(url)">
+        {{ winnerUrls.length > 1 ? 'Link ' + (i + 1) : 'Open in tab' }}
+      </button>
+      }
       } @else {
       <button (click)="onSearchGoogle()">Search on Google</button>
       }

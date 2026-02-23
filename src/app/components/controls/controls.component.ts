@@ -59,8 +59,8 @@ export class ControlsComponent {
     }
   }
 
-  onOpenInTab(): void {
-    this.svc.openWinnerInTab();
+  onOpenInTab(url: string): void {
+    this.svc.openInTab(url);
   }
 
   onSearchGoogle(): void {
@@ -81,6 +81,10 @@ export class ControlsComponent {
 
   get history() {
     return this.svc.history();
+  }
+
+  get winnerUrls(): string[] {
+    return this.svc.winnerUrls();
   }
 
   get isWinnerUrl(): boolean {
