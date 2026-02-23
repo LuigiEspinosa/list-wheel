@@ -50,6 +50,27 @@ export class ControlsComponent {
     this.showHistory = !this.showHistory;
   }
 
+  async onOpenFile(): Promise<void> {
+    try {
+      await this.svc.openFile();
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      throw err;
+    }
+  }
+
+  onOpenInTab(): void {
+    this.svc.openWinnerInTab();
+  }
+
+  onSearchGoogle(): void {
+    this.svc.searchWinnerOnGoogle();
+  }
+
+  onRemoveWinner(): void {
+    this.svc.removeWinner();
+  }
+
   get count() {
     return this.svc.entries().length;
   }
@@ -60,5 +81,13 @@ export class ControlsComponent {
 
   get history() {
     return this.svc.history();
+  }
+
+  get isWinnerUrl(): boolean {
+    return this.svc.isWinnerUrl();
+  }
+
+  get supportsFileSystemAccess(): boolean {
+    return this.svc.supportsFileSystemAccess;
   }
 }

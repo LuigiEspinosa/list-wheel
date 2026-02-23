@@ -1,13 +1,27 @@
 <div class="controls" role="region" aria-label="Controls">
+  @if (supportsFileSystemAccess) {
+  <button (click)="onOpenFile()">Open file</button>
+  } @else {
   <input type="file" accept=".txt" (change)="onFileSelected($event)" />
+  }
+
   <button (click)="onShuffle()" [disabled]="count === 0">Shuffle</button>
   <button (click)="onSpin()" [disabled]="count === 0">Spin</button>
   <button (click)="onClear()" [disabled]="count === 0">Clear</button>
 
-  <button (click)="onCopyWinner()" [disabled]="!winner">Copy Winner</button>
-  @if (winner) { <span>Winner: <strong>{{ winner }}</strong></span> }
-  @if (copied) { <span class="toast">Copied!</span> }
+  <button (click)="onCopyWinner()" [disabled]="!winner">Copy</button>
 
+  @if (winner) {
+  <span>Winner: <strong>{{ winner }}</strong></span>
+  @if (isWinnerUrl) {
+  <button (click)="onOpenInTab()">Open in tab</button>
+  } @else {
+  <button (click)="onSearchGoogle()">Search on Google</button>
+  }
+  <button (click)="onRemoveWinner()">Remove</button>
+  }
+
+  @if (copied) { <span class="toast">Copied!</span> }
   @if (count) { <span class="count">Loaded: {{ count | number }}</span> }
 
   <button (click)="toggleHistory()" [disabled]="history.length === 0">
