@@ -1,59 +1,100 @@
 # ListWheel
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.3.
+A browser-based spin wheel that picks winners from any plain-text list. Load a `.txt` file, shuffle, and spin. The winner is highlighted on the wheel. URL entries open directly in a new tab; plain-text entries offer a Google Search shortcut or a simple remove.
 
-## Development server
+Winners are progressively removed from the source file on disk in real time via the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API), so the pool stays in sync without re-uploading.
 
-To start a local development server, run:
+> **Live demo:** https://luigiespinosa.github.io/list-wheel/
 
-```bash
-ng serve
+## Highlights
+
+- **Real-time file sync:** the original `.txt` file on disk is rewritten after every accepted result; closing and reopening the app picks up exactly where you left off.
+- **Smart winner actions:** HTTP/HTTPS URLs open in a new tab; plain text shows a Google Search shortcut or a direct remove.
+- **Adaptive rendering:** label density and font size scale with the entry count; pure SVG handles thousands of items with no canvas library.
+- **Seeded shuffle:** Fisher-Yates algorithm with a Mulberry32 PRNG seeded from `crypto.getRandomValues`, making shuffles fast and cryptographically seeded.
+- **Winner history:** timestamped, ordered log persisted for the session.
+- **Signals-first state:** all shared state lives in `EntryService` as Angular signals; no NgRx, no `BehaviorSubject`, no manual subscriptions.
+
+## Architecture
+
+### Component tree
+
+```mermaid
+graph TD
+    A[AppComponent]
+    A -->|spin event| B[ControlsComponent]
+    A -->|wheel.spin| C[WheelSvgComponent]
+    B <-->|signals| D([EntryService])
+    C <-->|signals| D
+    D -->|syncToFile| E[(File System Access API)]
+    D -->|window.open| F[Browser Tab]
+    D -->|writeText| G[Clipboard API]
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Spin lifecycle
 
-## Code scaffolding
+```mermaid
+sequenceDiagram
+    actor User
+    participant Ctrl as ControlsComponent
+    participant App as AppComponent
+    participant Svc as EntryService
+    participant Wheel as WheelSvgComponent
+    participant FS as File System
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+    User->>Ctrl: Open file
+    Ctrl->>Svc: openFile()
+    Svc->>FS: showOpenFilePicker()
+    FS-->>Svc: FileSystemFileHandle
+    Svc->>Svc: loadFromText()
 
-```bash
-ng generate component component-name
+    User->>Ctrl: Spin
+    Ctrl-->>App: (spin) EventEmitter
+    App->>Wheel: wheel.spin()
+    Wheel->>Wheel: RAF loop + friction decay
+    Wheel->>Svc: lastWinner.set(winner)
+
+    User->>Ctrl: Copy / Remove
+    Ctrl->>Svc: copyWinnerAndRemove() / removeWinner()
+    Svc->>FS: createWritable() + write()
+    Svc->>Svc: history.update()
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+![ListWheel: System Architecture](https://raw.githubusercontent.com/LuigiEspinosa/list-wheel/main/public/images/excalidraw-architecture.png)
+
+## Tech stack
+
+| Concern        | Solution                                        |
+| -------------- | ----------------------------------------------- |
+| **Framework**  | Angular 20, standalone components.              |
+| **Build**      | @angular/build (esbuild).                       |
+| **State**      | signal, computed, effect.                       |
+| **Rendering**  | Pure SVG.                                       |
+| **File I/O**   | File System Access API.                         |
+| **RNG**        | Mulberry32, seeded from crypto.getRandomValues. |
+| **Testing**    | Karma + Jasmine + ChromeHeadless.               |
+| **Deployment** | angular-cli-ghpages.                            |
+
+## Local development
 
 ```bash
-ng generate --help
+npm install
+npm start     # http://localhost:4200
+npm test      # single headless Karma run
+
+# WSL users: Karma needs a Chrome binary. Run this once, then restart your shell:
+
+sudo apt-get install -y chromium
+echo 'export CHROME_BIN=/usr/bin/chromium' >> ~/.bashrc
 ```
 
-## Building
+## Browser support
 
-To build the project run:
+| Feature                 | Chrome / Edge 86+ | Firefox              | Safari               |
+| ----------------------- | ----------------- | -------------------- | -------------------- |
+| **Spin wheel**          | Yes               | Yes                  | Yes                  |
+| **Real-time file sync** | Yes               | No (read-only input) | No (read-only input) |
 
-```bash
-ng build
-```
+## License
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+[MIT](https://opensource.org/license/mit)
