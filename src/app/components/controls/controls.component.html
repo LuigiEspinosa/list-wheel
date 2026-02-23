@@ -1,53 +1,64 @@
-<div class="controls" role="region" aria-label="Controls">
-  @if (supportsFileSystemAccess) {
-  <button (click)="onOpenFile()">Open file</button>
-  } @else {
-  <input type="file" accept=".txt" (change)="onFileSelected($event)" />
-  }
+<div role="region" aria-label="Controls">
+  <div class="toolbar">
+    @if (supportsFileSystemAccess) {
+    <button (click)="onOpenFile()">Open file</button>
+    } @else {
+    <input type="file" accept=".txt" (change)="onFileSelected($event)" />
+    }
+    <button (click)="onShuffle()" [disabled]="count === 0">Shuffle</button>
+    <button (click)="onSpin()" [disabled]="count === 0">Spin</button>
+    <button (click)="onClear()" [disabled]="count === 0">Clear</button>
+    @if (count) { <span class="count">Loaded: {{ count | number }}</span> }
+  </div>
 
-  <button (click)="onShuffle()" [disabled]="count === 0">Shuffle</button>
-  <button (click)="onSpin()" [disabled]="count === 0">Spin</button>
-  <button (click)="onClear()" [disabled]="count === 0">Clear</button>
+  @if (winner || history.length > 0) {
+  <div class="results">
+    @if (winner) {
+    <div class="buttons-row">
+      <span>Winner: <strong>{{ winner }}</strong></span>
+    </div>
+    }
 
-  <button (click)="onCopyWinner()" [disabled]="!winner">Copy</button>
-
-  <button (click)="toggleHistory()" [disabled]="history.length === 0">
-    {{ showHistory ? 'Hide' : 'Show' }} history {{ history.length }}
-  </button>
-
-  @if (copied) { <span class="toast">Copied!</span> }
-  @if (count) { <span class="count">Loaded: {{ count | number }}</span> }
-
-  @if (winner) {
-  <span>Winner: <strong>{{ winner }}</strong></span>
-  @if (isWinnerUrl) {
-  <button (click)="onOpenInTab()">Open in tab</button>
-  } @else {
-  <button (click)="onSearchGoogle()">Search on Google</button>
-  }
-  <button (click)="onRemoveWinner()">Remove</button>
-  }
-</div>
-
-@if (showHistory) {
-<div class="history">
-  <table>
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Winner</th>
-        <th>Time</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (r of history; track r; let i = $index) {
-      <tr>
-        <td>{{ r.order }}</td>
-        <td>{{ r.text }}</td>
-        <td>{{ r.timestamp | date:'medium' }}</td>
-      </tr>
+    <div class="buttons-row">
+      @if (winner) {
+      <button (click)="onCopyWinner()">Copy</button>
+      @if (isWinnerUrl) {
+      <button (click)="onOpenInTab()">Open in tab</button>
+      } @else {
+      <button (click)="onSearchGoogle()">Search on Google</button>
       }
-    </tbody>
-  </table>
+      <button (click)="onRemoveWinner()">Remove</button>
+      @if (copied) { <span class="toast">Copied!</span> }
+      }
+
+      <button (click)="toggleHistory()" [disabled]="history.length === 0">
+        {{ showHistory ? 'Hide' : 'Show' }} history {{ history.length }}
+      </button>
+    </div>
+
+    @if (showHistory) {
+    <div class="history">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Winner</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of history; track r) {
+          <tr>
+            <td>{{ r.order }}</td>
+            <td>{{ r.text }}</td>
+            <td>{{ r.timestamp | date:'medium' }}</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    }
+
+  </div>
+  }
 </div>
-}
