@@ -1,0 +1,62 @@
+:root {
+  /* Background */
+  --bg-primary: #1f1633;
+  --bg-deeper: #150f23;
+  --bg-border: #362d59;
+
+  /* Interactive */
+  --color-purple: #6a5fc1;
+  --color-purple-muted: #79628c;
+  --color-purple-muted-border: #584674;
+  --color-violet-deep: #422082;
+
+  /* Accent */
+  --color-lime: #c2ef4e;
+  --color-coral: #ffb287;
+  --color-pink: #fa7faa;
+
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #e5e7eb;
+  --text-code-yellow: #dcdcaa;
+
+  /* Suface overlays */
+  --glass-white: rgba(255, 255, 255, 0.18);
+  --glass-dark: rgba(54, 22, 107, 0.14);
+
+  /* Shadows */
+  --shadow-inset: rgba(0, 0, 0, 0.1) 0 1px 3px 0 inset;
+  --shadow-surface: rgba(0, 0, 0, 0.08) 0 2px 8px;
+  --shadow-elevated: rgba(0, 0, 0, 0.1) 0 10px 15px -3px;
+  --shadow-prominent: rgba(0, 0, 0, 0.18) 0 0.5rem 1.5rem;
+  --shadow-ambient: rgba(22, 15, 36, 0.9) 0 4px 4px 9px;
+
+  /* Typography */
+  --font-display: 'Dammit Sans', 'Rubik', system-ui, sans-serif;
+  --font-ui: 'Rubik', -apple-system, system-ui, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-mono: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+
+  --fs-hero: 5.5rem; /* 88px */
+  --fs-display-2: 3.75rem; /* 60px */
+  --fs-section: 1.88rem; /* 30px */
+  --fs-sub: 1.69rem; /* 27px */
+  --fs-card: 1.5rem; /* 24px */
+  --fs-feature: 1.25rem; /* 20px */
+  --fs-body: 1rem; /* 16px */
+  --fs-nav: 0.94rem; /* 15px */
+  --fs-button: 0.88rem; /* 14px */
+  --fs-micro: 0.63rem; /* 10px */
+
+  --lh-tight: 1.2;
+  --lh-body: 1.5;
+
+  /* Radii */
+  --radius-input: 6px;
+  --radius-button: 8px;
+  --radius-card: 12px;
+  --radius-rounded: 13px;
+  --radius-pill: 18px;
+
+  /* Letter spacing */
+  --ls-caps: 0.2px;
+}
