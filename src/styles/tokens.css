@@ -32,7 +32,7 @@
   --shadow-ambient: rgba(22, 15, 36, 0.9) 0 4px 4px 9px;
 
   /* Typography */
-  --font-display: 'Dammit Sans', 'Rubik', system-ui, sans-serif;
+  --font-display: 'Rubik', system-ui, sans-serif;
   --font-ui: 'Rubik', -apple-system, system-ui, 'Segoe UI', Helvetica, Arial, sans-serif;
   --font-mono: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 

@@ -1,1 +1,23 @@
-/* You can add global styles to this file, and also import other style files */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background-color: var(--color-purple);
+  color: var(--text-primary);
+}
+
+*:focus-visible {
+  outline: 0.125rem solid var(--color-purple);
+  outline-offset: 2px;
+  border-radius: var(--radius-input);
+}
