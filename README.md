@@ -9,6 +9,7 @@ Winners are progressively removed from the source file on disk in real time via 
 ## Highlights
 
 - **Real-time file sync:** the original `.txt` file on disk is rewritten after every accepted result; closing and reopening the app picks up exactly where you left off.
+- **Inline entry editor:** toggle into an in-place editor that hides the wheel, lets you add, rename, or remove entries, and persists the edited list back to disk on save.
 - **Smart winner actions:** HTTP/HTTPS URLs open in a new tab; plain text shows a Google Search shortcut or a direct remove.
 - **Adaptive rendering:** label density and font size scale with the entry count; pure SVG handles thousands of items with no canvas library.
 - **Seeded shuffle:** Fisher-Yates algorithm with a Mulberry32 PRNG seeded from `crypto.getRandomValues`, making shuffles fast and cryptographically seeded.
@@ -24,8 +25,10 @@ graph TD
     A[AppComponent]
     A -->|spin event| B[ControlsComponent]
     A -->|wheel.spin| C[WheelSvgComponent]
+    A -->|edit mode| H[EntryEditorComponent]
     B <-->|signals| D([EntryService])
     C <-->|signals| D
+    H <-->|signals| D
     D -->|syncToFile| E[(File System Access API)]
     D -->|window.open| F[Browser Tab]
     D -->|writeText| G[Clipboard API]
