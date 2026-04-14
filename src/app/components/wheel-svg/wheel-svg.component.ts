@@ -148,5 +148,10 @@ export class WheelSvgComponent {
     const centerOfIdx = (idx + 0.5) * step;
     const targetWheelAngle = -(centerOfIdx + Math.PI / 2);
     this.angle.set(targetWheelAngle);
+
+    // * Screen readers - the aria-live region lives in app.component.html
+    //   and is the only non-visual cue that the wheel settled.
+    const live = document.getElementById('winner-live');
+    if (live && winner) live.textContent = `Winner: ${winner}`;
   }
 }

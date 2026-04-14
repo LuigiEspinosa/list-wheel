@@ -22,6 +22,8 @@ export class EntryService {
   private fileHandle = signal<FileSystemFileHandle | null>(null);
   private popupBlockedTimer: ReturnType<typeof setTimeout> | null = null;
 
+  private static readonly MAX_BYTES = 20 * 1024 * 1024;
+
   readonly hasFileHandle = computed(() => this.fileHandle() !== null);
   readonly isWinnerUrl = computed(() => this.winnerUrls().length > 0);
 
@@ -39,6 +41,11 @@ export class EntryService {
   });
 
   loadFromText(raw: string) {
+    if (raw.length > EntryService.MAX_BYTES) {
+      this.fileError.set('File is too large. Keep it under 20 MB.');
+      return;
+    }
+
     const lines = raw
       .split(/\r?\n/)
       .map((s) => s.trim())
