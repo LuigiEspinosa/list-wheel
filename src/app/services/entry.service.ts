@@ -203,8 +203,21 @@ export class EntryService {
    * Errors still flow through fileError() the same way upload erros do.
    */
   async saveEditorDraft(raw: string): Promise<void> {
+    const historySnapshot = this.history();
+    const lastWinnerSnapshot = this.lastWinner();
+    const winCounterSnapshot = this.winCounter;
+
     this.loadFromText(raw);
     if (this.fileError()) return;
+
+    this.history.set(historySnapshot);
+    this.winCounter = winCounterSnapshot;
+
+    if (lastWinnerSnapshot && this.entries().includes(lastWinnerSnapshot)) {
+      this.lastWinner.set(lastWinnerSnapshot);
+    } else {
+      this.lastWinner.set(null);
+    }
 
     await this.syncIfLinked();
     this.isEditing.set(false);

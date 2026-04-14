@@ -1,14 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  effect,
-  ElementRef,
-  EventEmitter,
-  inject,
-  Output,
-  signal,
-  ViewChild,
-} from '@angular/core';
+import { Component, EventEmitter, inject, Output, signal } from '@angular/core';
 import { EntryService } from '../../services/entry.service';
 import { DatePipe, DecimalPipe } from '@angular/common';
 
@@ -25,36 +15,7 @@ export class ControlsComponent {
 
   copied = false;
   showHistory = false;
-
-  @ViewChild('editorRef') editorRef?: ElementRef<HTMLTextAreaElement>;
-
   readonly error = signal<string | null>(null);
-  readonly findText = signal('');
-  readonly replaceText = signal('');
-  readonly matchCase = signal(false);
-  readonly noMatchHint = signal(false);
-
-  private noMatchTimer: ReturnType<typeof setTimeout> | null = null;
-
-  constructor() {
-    effect(() => {
-      const open = this.svc.isEditing();
-      if (!open) return;
-
-      queueMicrotask(() => {
-        const ta = this.editorRef?.nativeElement;
-        if (!ta) return;
-        ta.value = this.svc.entries().join('\n');
-        ta.focus();
-      });
-    });
-  }
-
-  ngAfterViewInit(): void {
-    // Left intentionally empty.
-    // Seeding happens in the effect above so
-    // it re-runs on every open, not just the first one.
-  }
 
   onShuffle() {
     this.svc.shuffle();
@@ -87,79 +48,7 @@ export class ControlsComponent {
   }
 
   onEdit(): void {
-    this.resetFindReplace();
     this.svc.openEditor();
-  }
-
-  onCancelEdit(): void {
-    this.svc.closeEditor();
-    this.resetFindReplace();
-  }
-
-  /**
-   * Editor-level keyboard shortcuts:
-   *    Escape            - cancel
-   *    Ctrl/Cmd+Enter    - save
-   *
-   * Native Ctrl/Cmd+z and Ctrl/Cmd+Shift+Z are handled by the browser
-   * on the focused textarea. We intentionally do not preventDefault on them.
-   */
-  onDraftKeydown(ev: KeyboardEvent): void {
-    if (ev.key === 'Escape') {
-      ev.preventDefault();
-      this.onCancelEdit();
-      return;
-    }
-
-    if ((ev.ctrlKey || ev.metaKey) && ev.key === 'Enter') {
-      ev.preventDefault();
-      this.onSaveEdit();
-    }
-  }
-
-  onFindInput(ev: Event): void {
-    this.findText.set((ev.target as HTMLInputElement).value);
-  }
-
-  onReplaceInput(ev: Event): void {
-    this.replaceText.set((ev.target as HTMLInputElement).value);
-  }
-
-  onMatchCaseToggle(ev: Event): void {
-    this.matchCase.set((ev.target as HTMLInputElement).checked);
-  }
-
-  /**
-   * Replace every ocurrence of findText with replaceText in the
-   * textarea, in place, as a single undo step.
-   */
-  onReplaceAll(): void {
-    const ta = this.editorRef?.nativeElement;
-    const needle = this.findText();
-    if (!ta || !needle) return;
-
-    const current = ta.value;
-    const flags = this.matchCase() ? 'g' : 'gi';
-    const escaped = this.escapeRegExp(needle);
-    const re = new RegExp(escaped, flags);
-
-    if (!re.test(current)) {
-      this.flashNoMatch();
-      return;
-    }
-
-    const next = current.replace(re, this.replaceText());
-
-    ta.focus();
-    ta.select();
-    const ok = document.execCommand('insertText', false, next);
-    if (!ok) {
-      console.warn(
-        'controls: execCommand insertText reject by the browser. falling back to direct assignment (undo history will be cleared)',
-      );
-      ta.value = next;
-    }
-    ta.setSelectionRange(0, 0);
   }
 
   async onFileSelected(ev: Event) {
@@ -193,37 +82,6 @@ export class ControlsComponent {
       // ! Never re-throw here - re-throwing from an event hanlder becomes
       //   an unhandled promise rejection with no UI feedback.
       this.error.set(err instanceof Error ? err.message : 'Could not open file.');
-    }
-  }
-
-  async onSaveEdit(): Promise<void> {
-    const ta = this.editorRef?.nativeElement;
-    const raw = ta?.value ?? '';
-    await this.svc.saveEditorDraft(raw);
-    if (!this.svc.isEditing) this.resetFindReplace();
-  }
-
-  private escapeRegExp(s: string): string {
-    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
-
-  private flashNoMatch(): void {
-    this.noMatchHint.set(true);
-    if (this.noMatchTimer) clearTimeout(this.noMatchTimer);
-    this.noMatchTimer = setTimeout(() => {
-      this.noMatchHint.set(false);
-      this.noMatchTimer = null;
-    }, 2000);
-  }
-
-  private resetFindReplace(): void {
-    this.findText.set('');
-    this.replaceText.set('');
-    this.matchCase.set(false);
-    this.noMatchHint.set(false);
-    if (this.noMatchTimer) {
-      clearTimeout(this.noMatchTimer);
-      this.noMatchTimer = null;
     }
   }
 
@@ -261,9 +119,5 @@ export class ControlsComponent {
 
   get isEditing(): boolean {
     return this.svc.isEditing();
-  }
-
-  get canReplace(): boolean {
-    return this.findText().length > 0;
   }
 }

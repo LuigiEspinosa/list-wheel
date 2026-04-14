@@ -19,36 +19,6 @@
     @if (count) { <span class="count">Loaded: {{ count | number }}</span> }
   </div>
 
-  @if (isEditing) {
-  <div class="editor" role="group" aria-label="Entry editor">
-    <div class="editor__find-row">
-      <input class="editor__find-input" type="text" placeholder="Find" [value]="findText()"
-        (input)="onFindInput($event)" aria-label="Find text" />
-      <input class="editor__find-input" type="text" placeholder="Replace with" [value]="replaceText()"
-        (input)="onReplaceInput($event)" aria-label="Replace with" />
-      <label>
-        <input type="checkbox" [checked]="matchCase()" (change)="onMatchCaseToggle($event)" />
-        Match case
-      </label>
-      <button (click)="onReplaceAll()" [disabled]="!canReplace" aria-label="Replace all">
-        Replace all
-      </button>
-      @if (noMatchHint()) {
-      <span class="editor__no-match" role="status">No matches</span>
-      }
-    </div>
-
-    <textarea #editorRef class="editor__textarea" (keydown)="onDraftKeydown($event)" spellcheck="false"
-      aria-label="Entries, one per line" rows="16"></textarea>
-
-    <div class="buttons-row">
-      <button (click)="onSaveEdit()">Save</button>
-      <button (click)="onCancelEdit()">Cancel</button>
-      <span class="hint">Esc to cancel, Ctrl/Cmd+Enter to save, Ctrl/Cmd+z to undo</span>
-    </div>
-  </div>
-  }
-
   @if (!isEditing && (winner || history.length > 0)) {
   <div class="results">
     @if (winner) {
