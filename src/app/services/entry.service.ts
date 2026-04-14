@@ -151,6 +151,19 @@ export class EntryService {
       multiple: false,
     });
 
+    // * Ask for write permission up front. If the user declines we still
+    //   load the file for this session, but we clear the handle so
+    //   syncToFile becomes a no-op and the UI explains why
+    const perm = await handle.requestPermission({ mode: 'readwrite' });
+    if (perm !== 'granted') {
+      this.fileHandle.set(null);
+      this.fileError.set('Write permission denied - real-time file sync disabled for this file.');
+      const file = await handle.getFile();
+      this.loadFromText(await file.text());
+      return;
+    }
+
+    this.fileError.set(null);
     this.fileHandle.set(handle);
     const file = await handle.getFile();
     this.loadFromText(await file.text());
