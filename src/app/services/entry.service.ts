@@ -1,4 +1,4 @@
-import { computed, Injectable, signal } from "@angular/core";
+import { computed, Injectable, signal } from '@angular/core';
 
 export interface WinnerRecord {
   text: string;
@@ -7,7 +7,6 @@ export interface WinnerRecord {
 }
 
 @Injectable({ providedIn: 'root' })
-
 export class EntryService {
   readonly entries = signal<string[]>([]);
   readonly hasEntries = computed(() => this.entries().length > 0);
@@ -24,7 +23,7 @@ export class EntryService {
   readonly winnerUrls = computed(() => {
     const w = this.lastWinner();
     if (!w) return [];
-    return w.split(/\s+/).filter(token => {
+    return w.split(/\s+/).filter((token) => {
       try {
         const url = new URL(token);
         return url.protocol === 'http:' || url.protocol === 'https:';
@@ -35,14 +34,17 @@ export class EntryService {
   });
 
   loadFromText(raw: string) {
-    const lines = raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+    const lines = raw
+      .split(/\r?\n/)
+      .map((s) => s.trim())
+      .filter(Boolean);
     const seen = new Set<string>();
 
-    const unique = lines.filter(line => {
+    const unique = lines.filter((line) => {
       if (seen.has(line)) return false;
       seen.add(line);
       return true;
-    })
+    });
 
     this.entries.set(unique);
     this.lastWinner.set(null);
@@ -50,7 +52,7 @@ export class EntryService {
 
   mulberry32(seed: number) {
     return function () {
-      let t = (seed += 0x6D2B79F5);
+      let t = (seed += 0x6d2b79f5);
       t = Math.imul(t ^ (t >>> 15), t | 1);
       t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
@@ -71,7 +73,7 @@ export class EntryService {
   }
 
   clear() {
-    this.entries.set([])
+    this.entries.set([]);
     this.lastWinner.set(null);
   }
 
@@ -109,25 +111,35 @@ export class EntryService {
     const ok = await this.copyWinner();
     if (!ok) return false;
 
+    await this.finalizeWinner(text);
+    return true;
+  }
+
+  async removeWinner(): Promise<void> {
+    const text = this.lastWinner();
+    if (!text) return;
+    await this.finalizeWinner(text);
+  }
+
+  private async finalizeWinner(text: string): Promise<void> {
     const arr = this.entries().slice();
     const idx = arr.indexOf(text);
 
-    if (idx >= 0) {
-      arr.splice(idx, 1);
-      this.entries.set(arr);
+    // * If entries changed mid-spin the winner may already be gone.
+    //   Clear UI state and bail withot writing a ghost history entry
+    //   or advancing the win counter.
+    if (idx < 0) {
+      this.lastWinner.set(null);
+      return;
     }
+
+    arr.splice(idx, 1);
+    this.entries.set(arr);
 
     this.winCounter += 1;
-    const rec: WinnerRecord = {
-      text,
-      timestamp: Date.now(),
-      order: this.winCounter
-    }
-
-    this.history.update(h => [rec, ...h]);
+    this.history.update((h) => [{ text, timestamp: Date.now(), order: this.winCounter }, ...h]);
     this.lastWinner.set(null);
     await this.syncToFile();
-    return true;
   }
 
   async openFile(): Promise<void> {
@@ -159,20 +171,7 @@ export class EntryService {
     window.open(
       `https://www.google.com/search?q=${encodeURIComponent(w)}`,
       '_blank',
-      'noopener,noreferrer'
+      'noopener,noreferrer',
     );
-  }
-
-  removeWinner(): void {
-    const w = this.lastWinner();
-    if (!w) return;
-    const arr = this.entries().slice();
-    const idx = arr.indexOf(w);
-    if (idx >= 0) arr.splice(idx, 1);
-    this.entries.set(arr);
-    this.winCounter += 1;
-    this.history.update(h => [{ text: w, timestamp: Date.now(), order: this.winCounter }, ...h]);
-    this.lastWinner.set(null);
-    this.syncToFile().catch(() => { });
   }
 }
