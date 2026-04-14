@@ -5,12 +5,13 @@ import { EntryService } from '../../services/entry.service';
   selector: 'app-wheel-svg',
   standalone: true,
   templateUrl: './wheel-svg.component.html',
-  styleUrls: ['./wheel-svg.component.css']
+  styleUrls: ['./wheel-svg.component.css'],
 })
-
 export class WheelSvgComponent {
   private angularVelocity = 0;
   private rafId: number | null = null;
+  private lastFingerprint = '';
+
   readonly rStart = 12;
   readonly rEnd = 46;
 
@@ -47,7 +48,16 @@ export class WheelSvgComponent {
 
   constructor() {
     effect(() => {
-      this.entries();
+      const list = this.svc.entries();
+      // * Fingerprint distinguishes load/clear from shuffle, Shuffles keep
+      //   length but usually change the first element, so thay pass through
+      //   without wiping the winner. A shuffle that happens to keep
+      //   entries[0] will incorrectly preserve the winner - acceptable
+      //   since the center label is informational, not authoritative.
+      const fp = `${list.length}:${list[0] ?? ''}`;
+      if (fp === this.lastFingerprint) return;
+
+      this.lastFingerprint = fp;
       this.stop();
       this.angle.set(0);
       this.svc.lastWinner.set(null);
@@ -69,10 +79,9 @@ export class WheelSvgComponent {
   labelMaxChars(stepRad: number): number {
     const fs = this.labelFontSize(stepRad);
     const radialSpace = Math.max(2, this.rEnd - this.rStart);
-    const approxChars = Math.floor((radialSpace / (fs * 0.6)));
+    const approxChars = Math.floor(radialSpace / (fs * 0.6));
     return Math.max(4, approxChars);
   }
-
 
   radialLabel(i: number): string {
     const list = this.entries();
@@ -82,7 +91,7 @@ export class WheelSvgComponent {
   }
 
   spin() {
-    if (this.spinning() || this.n() === 0) return;
+    if (this.spinning() || this.svc.entries().length === 0) return;
     const turns = 4 + Math.random() * 4;
     const spinDuration = 4 + Math.random() * 1;
     this.angularVelocity = (turns * 2 * Math.PI) / spinDuration;
@@ -94,8 +103,11 @@ export class WheelSvgComponent {
     const friction = 0.995;
     const start = performance.now();
     const tick = (now: number, last: number) => {
-      const dt = (now - last) / 1000;
-      this.angle.update(a => (a + this.angularVelocity * dt) % (2 * Math.PI));
+      // * Clamp dt so a background tab (RAF pauses) cannot jump the whell
+      //   by senconds of friction in one step. 50ms caps the worst case at
+      //   roughly three frames of motion on resume.
+      const dt = Math.min((now - last) / 1000, 0.05);
+      this.angle.update((a) => (a + this.angularVelocity * dt) % (2 * Math.PI));
       this.angularVelocity *= Math.pow(friction, dt * 60);
 
       if (this.angularVelocity < 0.2) {
@@ -117,14 +129,20 @@ export class WheelSvgComponent {
   }
 
   private snapAndPickWinner() {
-    const n = this.n();
-    const step = this.step();
+    const list = this.entries();
+    const n = list.length;
+    if (n === 0) {
+      // * Entries were cleared mid-spin. Bail instead of picking undefined.
+      this.svc.lastWinner.set(null);
+      return;
+    }
+    const step = (2 * Math.PI) / n;
 
     let pointerAngle = (-this.angle() - Math.PI / 2) % (2 * Math.PI);
     if (pointerAngle < 0) pointerAngle += 2 * Math.PI;
 
     const idx = Math.floor(pointerAngle / step) % n;
-    const winner = this.entries()[idx] ?? null;
+    const winner = list[idx] ?? null;
     this.svc.lastWinner.set(winner);
 
     const centerOfIdx = (idx + 0.5) * step;
