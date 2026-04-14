@@ -51,6 +51,8 @@ export class EntryService {
 
     this.entries.set(unique);
     this.lastWinner.set(null);
+    this.history.set([]);
+    this.winCounter = 0;
   }
 
   mulberry32(seed: number) {
@@ -78,6 +80,8 @@ export class EntryService {
   clear() {
     this.entries.set([]);
     this.lastWinner.set(null);
+    this.history.set([]);
+    this.winCounter = 0;
   }
 
   async copyWinner(): Promise<boolean> {
