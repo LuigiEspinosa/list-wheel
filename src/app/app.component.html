@@ -9,7 +9,9 @@
     <div id="winner-live" aria-live="polite" class="sr-only"></div>
   </section>
 
+  @if (!isEditing()) {
   <section class="wheel-wrap">
     <app-wheel-svg></app-wheel-svg>
   </section>
+  }
 </main>

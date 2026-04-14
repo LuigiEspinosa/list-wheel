@@ -15,6 +15,7 @@ export class EntryService {
   readonly supportsFileSystemAccess = 'showOpenFilePicker' in window;
   readonly fileError = signal<string | null>(null);
   readonly popupBlocked = signal(false);
+  readonly isEditing = signal(false);
 
   private winCounter = 0;
   private writing = false;
@@ -93,6 +94,39 @@ export class EntryService {
     this.winCounter = 0;
   }
 
+  openInTab(url: string): void {
+    const w = window.open(url, '_blank', 'noopener,noreferrer');
+    if (!w) this.flagPopupBlocked();
+  }
+
+  searchWinnerOnGoogle(): void {
+    const w = this.lastWinner();
+    if (!w) return;
+    const win = window.open(
+      `https://www.google.com/search?q=${encodeURIComponent(w)}`,
+      '_blank',
+      'noopener,noreferrer',
+    );
+    if (!win) this.flagPopupBlocked();
+  }
+
+  /**
+   * Open the inline editor. No-op when the list is empty, because the
+   * textarea would be balnk and the Edit button is already disabled in
+   * that case.
+   *
+   * This guard is a blet-and-braces check for programmatic callers.
+   */
+  openEditor(): void {
+    if (this.entries().length === 0) return;
+    this.isEditing.set(true);
+  }
+
+  /** Close the editor without mutating entries. */
+  closeEditor(): void {
+    this.isEditing.set(false);
+  }
+
   async copyWinner(): Promise<boolean> {
     const text = this.lastWinner();
     if (!text) return false;
@@ -137,27 +171,6 @@ export class EntryService {
     await this.finalizeWinner(text);
   }
 
-  private async finalizeWinner(text: string): Promise<void> {
-    const arr = this.entries().slice();
-    const idx = arr.indexOf(text);
-
-    // * If entries changed mid-spin the winner may already be gone.
-    //   Clear UI state and bail withot writing a ghost history entry
-    //   or advancing the win counter.
-    if (idx < 0) {
-      this.lastWinner.set(null);
-      return;
-    }
-
-    arr.splice(idx, 1);
-    this.entries.set(arr);
-
-    this.winCounter += 1;
-    this.history.update((h) => [{ text, timestamp: Date.now(), order: this.winCounter }, ...h]);
-    this.lastWinner.set(null);
-    await this.syncToFile();
-  }
-
   async openFile(): Promise<void> {
     const [handle] = await window.showOpenFilePicker({
       types: [{ description: 'Text files', accept: { 'text/plain': ['.txt'] } }],
@@ -180,6 +193,50 @@ export class EntryService {
     this.fileHandle.set(handle);
     const file = await handle.getFile();
     this.loadFromText(await file.text());
+  }
+
+  /**
+   * Apply a draft from the editor through the same parsing path as a
+   * fresh file upload, then push the result to be linked file when one
+   * is attached. Returning void keeps callers simple.
+   *
+   * Errors still flow through fileError() the same way upload erros do.
+   */
+  async saveEditorDraft(raw: string): Promise<void> {
+    this.loadFromText(raw);
+    if (this.fileError()) return;
+
+    await this.syncIfLinked();
+    this.isEditing.set(false);
+  }
+
+  private flagPopupBlocked(): void {
+    this.popupBlocked.set(true);
+    if (this.popupBlockedTimer) clearTimeout(this.popupBlockedTimer);
+    // * Auto-clear after 5s so the banner does not linger after the user
+    //   has granted the popup permission and moved on.
+    this.popupBlockedTimer = setTimeout(() => this.popupBlocked.set(false), 5000);
+  }
+
+  private async finalizeWinner(text: string): Promise<void> {
+    const arr = this.entries().slice();
+    const idx = arr.indexOf(text);
+
+    // * If entries changed mid-spin the winner may already be gone.
+    //   Clear UI state and bail withot writing a ghost history entry
+    //   or advancing the win counter.
+    if (idx < 0) {
+      this.lastWinner.set(null);
+      return;
+    }
+
+    arr.splice(idx, 1);
+    this.entries.set(arr);
+
+    this.winCounter += 1;
+    this.history.update((h) => [{ text, timestamp: Date.now(), order: this.winCounter }, ...h]);
+    this.lastWinner.set(null);
+    await this.syncToFile();
   }
 
   private async syncToFile(): Promise<void> {
@@ -215,27 +272,13 @@ export class EntryService {
     }
   }
 
-  openInTab(url: string): void {
-    const w = window.open(url, '_blank', 'noopener,noreferrer');
-    if (!w) this.flagPopupBlocked();
-  }
-
-  searchWinnerOnGoogle(): void {
-    const w = this.lastWinner();
-    if (!w) return;
-    const win = window.open(
-      `https://www.google.com/search?q=${encodeURIComponent(w)}`,
-      '_blank',
-      'noopener,noreferrer',
-    );
-    if (!win) this.flagPopupBlocked();
-  }
-
-  private flagPopupBlocked(): void {
-    this.popupBlocked.set(true);
-    if (this.popupBlockedTimer) clearTimeout(this.popupBlockedTimer);
-    // * Auto-clear after 5s so the banner does not linger after the user
-    //   has granted the popup permission and moved on.
-    this.popupBlockedTimer = setTimeout(() => this.popupBlocked.set(false), 5000);
+  /**
+   * Write current entries to disk only when a FileSystemFileHandle is
+   * attached. Thin wrapper so callers do not need to know about the
+   * private syncToFile or read fileHandle directly.
+   */
+  private async syncIfLinked(): Promise<void> {
+    if (!this.hasFileHandle()) return;
+    await this.syncToFile();
   }
 }

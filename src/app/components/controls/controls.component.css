@@ -6,7 +6,8 @@
 }
 
 .toolbar button,
-.buttons-row button {
+.buttons-row button,
+.editor button {
   font-family: var(--font-ui);
   font-size: var(--fs-button);
   font-weight: 500;
@@ -37,9 +38,6 @@
   box-shadow: none;
 }
 
-/* * Spin is the single primary CTA of the product. DESIGN.md section 4
-     reserves the white-solid treatment for "high-visibility CTA on dark
-     backgrounds". Do not extend this style to any other button. */
 .toolbar button.spin {
   background: var(--text-primary);
   color: var(--bg-primary);
@@ -176,4 +174,81 @@
   text-transform: uppercase;
   letter-spacing: var(--ls-caps);
   margin-bottom: 0.75rem;
+}
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #1f1633;
+  border: 1px solid #362d59;
+  border-radius: 0.5rem;
+}
+
+.editor__textarea {
+  width: 100%;
+  min-height: 22rem;
+  resize: vertical;
+  padding: 0.75rem;
+  font-family: Monaco, Menlo, 'Ubuntu Mono', monospace;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #ffffff;
+  background: #150f23;
+  border: 1px solid #362d59;
+  border-radius: 0.375rem;
+  caret-color: #c2ef4e;
+}
+
+.editor__textarea:focus {
+  outline: none;
+  border-color: #6a5fc1;
+  box-shadow: 0 0 0 2px rgba(106, 95, 193, 0.35);
+}
+
+.hint {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  font-family: Monaco, Menlo, 'Ubuntu Mono', monospace;
+}
+
+.editor__find-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.editor__find-input {
+  flex: 1 1 12rem;
+  min-width: 10rem;
+  padding: 0.4rem 0.6rem;
+  font-family: Monaco, Menlo, 'Ubuntu Mono', monospace;
+  font-size: 0.85rem;
+  color: #ffffff;
+  background: #150f23;
+  border: 1px solid #362d59;
+  border-radius: 0.375rem;
+}
+
+.editor__find-input:focus {
+  outline: none;
+  border-color: #6a5fc1;
+  box-shadow: 0 0 0 2px rgba(106, 95, 193, 0.35);
+}
+
+.editor__match-case {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: #e5e7eb;
+}
+
+.editor__no-match {
+  font-size: 0.75rem;
+  color: #ffb287;
+  font-family: Monaco, Menlo, 'Ubuntu Mono', monospace;
 }
