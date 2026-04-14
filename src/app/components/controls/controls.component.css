@@ -5,13 +5,108 @@
   flex-wrap: wrap;
 }
 
+.toolbar button,
+.buttons-row button {
+  font-family: var(--font-ui);
+  font-size: var(--fs-button);
+  font-weight: 500;
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-rounded);
+  border: 1px solid var(--color-purple-muted-border);
+  background: var(--color-purple-muted);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-inset);
+  cursor: pointer;
+  transition:
+    box-shadow 120ms ease,
+    background-color 120ms ease,
+    color 120ms ease;
+}
+
+.toolbar button:hover:not(:disabled),
+.buttons-row button:hover:not(:disabled) {
+  box-shadow: var(--shadow-prominent);
+}
+
+.toolbar button:disabled,
+.buttons-row button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* * Spin is the single primary CTA of the product. DESIGN.md section 4
+     reserves the white-solid treatment for "high-visibility CTA on dark
+     backgrounds". Do not extend this style to any other button. */
+.toolbar button.spin {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border-color: var(--text-primary);
+  border-radius: var(--radius-button);
+  box-shadow: var(--shadow-surface);
+}
+
+.toolbar button.spin:hover:not(:disabled) {
+  background: var(--color-purple);
+  color: var(--text-primary);
+  border-color: var(--color-purple);
+}
+
+.toolbar button.spin:focus-visible {
+  background: var(--color-coral);
+  color: var(--bg-primary);
+}
+
+.toolbar input[type='file'] {
+  font-family: var(--font-ui);
+  font-size: var(--fs-button);
+  color: var(--text-primary);
+  background: transparent;
+  border: 1px solid var(--color-purple-muted-border);
+  border-radius: var(--radius-button);
+  padding: 0.35rem 0.5rem;
+}
+
+.toolbar input[type='file']::file-selector-button {
+  font-family: var(--font-ui);
+  font-size: var(--fs-button);
+  font-weight: 500;
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-rounded);
+  border: 1px solid var(--color-purple-muted-border);
+  background: var(--color-purple-muted);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-inset);
+  cursor: pointer;
+  margin-right: 0.75rem;
+}
+
+.fallback-note {
+  font-size: var(--fs-button);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: var(--fs-nav);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+}
+
 .results {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   margin-top: 1rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--bg-border);
 }
 
 .buttons-row {
@@ -21,23 +116,64 @@
   flex-wrap: wrap;
 }
 
-.count {
-  opacity: 0.7;
+.buttons-row strong {
+  font-family: var(--font-mono);
+  color: var(--color-lime);
 }
 
 .toast {
-  color: #0a7;
+  color: var(--color-lime);
   font-weight: 600;
+  font-size: var(--fs-button);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
 }
 
-button {
-  padding: 0.5rem 0.9rem;
-  border-radius: 0.5rem;
-  border: 1px solid #ddd;
-  cursor: pointer;
+.history {
+  margin-top: 0.5rem;
+  background: var(--bg-deeper);
+  border: 1px solid var(--bg-border);
+  border-radius: var(--radius-card);
+  padding: 0.75rem 1rem;
+  max-height: 320px;
+  overflow-y: auto;
 }
 
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.history table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-button);
+}
+
+.history th {
+  text-align: left;
+  padding: 0.25rem 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--bg-border);
+}
+
+.history td {
+  padding: 0.35rem 0.5rem;
+  border-bottom: 1px solid var(--bg-border);
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+}
+
+.history tr:last-child td {
+  border-bottom: none;
+}
+
+.banner {
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-button);
+  background: var(--glass-dark);
+  border: 1px solid var(--color-pink);
+  color: var(--color-coral);
+  font-size: var(--fs-button);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+  margin-bottom: 0.75rem;
 }
