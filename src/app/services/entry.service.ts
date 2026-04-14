@@ -13,8 +13,11 @@ export class EntryService {
   readonly lastWinner = signal<string | null>(null);
   readonly history = signal<WinnerRecord[]>([]);
   readonly supportsFileSystemAccess = 'showOpenFilePicker' in window;
+  readonly fileError = signal<string | null>(null);
 
   private winCounter = 0;
+  private writing = false;
+  private pendingWrite = false;
   private fileHandle = signal<FileSystemFileHandle | null>(null);
 
   readonly hasFileHandle = computed(() => this.fileHandle() !== null);
@@ -156,9 +159,34 @@ export class EntryService {
   private async syncToFile(): Promise<void> {
     const handle = this.fileHandle();
     if (!handle) return;
-    const writable = await handle.createWritable();
-    await writable.write(this.entries().join('\n'));
-    await writable.close();
+
+    // * Serialize writes: the FSA writable is locked while open, but a
+    //   burst of clicks can still queue multiple createWritable calls.
+    //   We collapse a burst into on trailing write - last-write-wins is
+    //   correct for a single-user wheel.
+    if (this.writing) {
+      this.pendingWrite = true;
+      return;
+    }
+    this.writing = true;
+
+    try {
+      const writable = await handle.createWritable();
+      await writable.write(this.entries().join('\n'));
+      await writable.close();
+      this.fileError.set(null);
+    } catch (err) {
+      // ! File write failures are user-visible - surface via signal,
+      //   do not swallow.
+      console.error('syncToFile failed', err);
+      this.fileError.set(err instanceof Error ? err.message : 'Could not write to file.');
+    } finally {
+      this.writing = false;
+      if (this.pendingWrite) {
+        this.pendingWrite = false;
+        await this.syncToFile();
+      }
+    }
   }
 
   openInTab(url: string): void {
