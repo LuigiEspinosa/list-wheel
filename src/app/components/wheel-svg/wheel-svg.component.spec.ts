@@ -193,4 +193,55 @@ describe('WheelSvgComponent', () => {
       comp['stop']();
     });
   });
+
+  // ---- winnerSize tiers ----
+  it('returns "sm" when there is no winner', () => {
+    svc.lastWinner.set(null);
+    expect(comp.winnerSize()).toBe('sm');
+  });
+
+  it('returns "lg" for names up to 12 chars', () => {
+    svc.lastWinner.set('Alice Smith');
+    expect(comp.winnerSize()).toBe('lg');
+    svc.lastWinner.set('123456789012');
+    expect(comp.winnerSize()).toBe('lg');
+  });
+
+  it('returns "md" for names 13-24 chars', () => {
+    svc.lastWinner.set('1234567890123');
+    expect(comp.winnerSize()).toBe('md');
+    svc.lastWinner.set('123456789012345678901234');
+    expect(comp.winnerSize()).toBe('md');
+  });
+
+  it('returns "sm" for names 25-40 chars', () => {
+    svc.lastWinner.set('1234567890123456789012345');
+    expect(comp.winnerSize()).toBe('sm');
+    svc.lastWinner.set('1234567890123456789012345678901234567890');
+    expect(comp.winnerSize()).toBe('sm');
+  });
+
+  it('retuns "xs" for names over 40 chars', () => {
+    svc.lastWinner.set('12345678901234567890123456789012345678901');
+    expect(comp.winnerSize()).toBe('xs');
+  });
+
+  it('renders the winner badge in the DOM when a winner is set', () => {
+    svc.loadFromText('Alice');
+    fixture.detectChanges();
+    svc.lastWinner.set('Alice');
+    fixture.detectChanges();
+    const badge = fixture.nativeElement.querySelector('.winner-badge');
+    expect(badge).not.toBeNull();
+    expect(badge.textContent).toContain('Alice');
+  });
+
+  it('does not render the winner badge when no winner is set', () => {
+    svc.loadFromText('Alice');
+    fixture.detectChanges();
+    svc.lastWinner.set(null);
+    fixture.detectChanges();
+    const badge = fixture.nativeElement.querySelector('.winner-badge');
+    expect(badge).toBeNull();
+  });
 });

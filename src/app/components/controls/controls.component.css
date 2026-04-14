@@ -163,6 +163,10 @@
   border-bottom: none;
 }
 
+.history td:last-child {
+  min-width: 120px;
+}
+
 .banner {
   padding: 0.5rem 0.75rem;
   border-radius: var(--radius-button);

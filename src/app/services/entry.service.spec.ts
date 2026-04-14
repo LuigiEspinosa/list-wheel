@@ -389,4 +389,90 @@ describe('EntryService', () => {
       expect(svc.hasFileHandle()).toBeTrue();
     });
   });
+
+  // ---- Editor ----
+
+  describe('openEditor / closeEditor', () => {
+    it('openEditor is a no-op when entries are empty', () => {
+      svc.openEditor();
+      expect(svc.isEditing()).toBeFalse();
+    });
+
+    it('openEditor flips isEditing when entries exist', () => {
+      svc.loadFromText('Alice');
+      svc.openEditor();
+      expect(svc.isEditing()).toBeTrue();
+    });
+
+    it('closeEditor flips isEditing back to false', () => {
+      svc.loadFromText('Alice');
+      svc.openEditor();
+      svc.closeEditor();
+      expect(svc.isEditing()).toBeFalse();
+    });
+  });
+
+  describe('saveEditorDraft', () => {
+    beforeEach(() => {
+      svc.loadFromText('Alice\nBob\nCarol');
+    });
+
+    it('parses the draft through loadFromText semantics', async () => {
+      await svc.saveEditorDraft('  Alice  \nBob\nCarol\nDave');
+      expect(svc.entries()).toEqual(['Alice', 'Bob', 'Carol', 'Dave']);
+    });
+
+    it('closes the editor on success', async () => {
+      svc.openEditor();
+      await svc.saveEditorDraft('Alice\nBob');
+      expect(svc.isEditing()).toBeFalse();
+    });
+
+    it('keeps the editor open when the draft exceeds MAX_BYTES', async () => {
+      svc.openEditor();
+      const huge = 'x'.repeat(21 * 1024 * 1024);
+      await svc.saveEditorDraft(huge);
+      expect(svc.isEditing()).toBeTrue();
+      expect(svc.fileError()).not.toBeNull();
+      expect(svc.entries()).toEqual(['Alice', 'Bob', 'Carol']);
+    });
+
+    it('preserves history acorss an edit', async () => {
+      svc.lastWinner.set('Alice');
+      svc.removeWinner();
+      const hBefore = svc.history();
+      expect(hBefore.length).toBe(1);
+
+      svc.openEditor();
+      await svc.saveEditorDraft('Bob\nCarol\nDave');
+      expect(svc.history()).toEqual(hBefore);
+    });
+
+    it('preserves the winCounter across an edit', async () => {
+      svc.lastWinner.set('Alice');
+      svc.removeWinner();
+      svc.lastWinner.set('Bob');
+      svc.removeWinner();
+
+      await svc.saveEditorDraft('Carol\nDave');
+      svc.lastWinner.set('Carol');
+      svc.removeWinner();
+      const [latest] = svc.history();
+      expect(latest.order).toBe(3);
+    });
+
+    it('reinstates lastWinner when the winner still exists in the new entries', async () => {
+      svc.lastWinner.set('Alice');
+      svc.openEditor();
+      await svc.saveEditorDraft('Alice\nBob\nCarol\nDave');
+      expect(svc.lastWinner()).toBe('Alice');
+    });
+
+    it('clears lastWinner when the winner was removed by the edit', async () => {
+      svc.lastWinner.set('Alice');
+      svc.openEditor();
+      await svc.saveEditorDraft('Bob\nCarol');
+      expect(svc.lastWinner()).toBeNull();
+    });
+  });
 });

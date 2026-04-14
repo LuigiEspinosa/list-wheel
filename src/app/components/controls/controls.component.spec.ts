@@ -8,7 +8,7 @@ describe('ControlsComponent', () => {
   let svc: EntryService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({ imports: [ControlsComponent] });
     fixture = TestBed.createComponent(ControlsComponent);
     comp = fixture.componentInstance;
     svc = TestBed.inject(EntryService);
@@ -206,6 +206,27 @@ describe('ControlsComponent', () => {
       comp.showHistory = true;
       comp.toggleHistory();
       expect(comp.showHistory).toBeFalse();
+    });
+  });
+
+  // ---- onEdit ----
+  describe('onEdit', () => {
+    it('Edit button is disabled when the list is empty', () => {
+      const btn = fixture.nativeElement.querySelector('button:nth-of-type(5)');
+      expect(btn.textContent.trim()).toBe('Edit');
+      expect(btn.disabled).toBeTrue();
+    });
+
+    it('Edit button flips isEditing via the service', () => {
+      svc.loadFromText('Alice');
+      fixture.detectChanges();
+      comp.onEdit();
+      expect(svc.isEditing()).toBeTrue();
+    });
+
+    it('onEdit is a no-op when the list is empty', () => {
+      comp.onEdit();
+      expect(svc.isEditing()).toBeFalse();
     });
   });
 });
