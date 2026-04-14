@@ -1,29 +1,36 @@
-import { Component, EventEmitter, inject, Output } from "@angular/core";
-import { EntryService } from "../../services/entry.service";
-import { DatePipe, DecimalPipe } from "@angular/common";
+import { Component, EventEmitter, inject, Output, signal } from '@angular/core';
+import { EntryService } from '../../services/entry.service';
+import { DatePipe, DecimalPipe } from '@angular/common';
 
 @Component({
   selector: 'app-controls',
   standalone: true,
   imports: [DecimalPipe, DatePipe],
   templateUrl: './controls.component.html',
-  styleUrls: ['./controls.component.css']
+  styleUrls: ['./controls.component.css'],
 })
-
 export class ControlsComponent {
   private svc = inject(EntryService);
   @Output() spin = new EventEmitter<void>();
 
   copied = false;
   showHistory = false;
+  readonly error = signal<string | null>(null);
 
-  onFileSelected(ev: Event) {
+  async onFileSelected(ev: Event) {
     const input = ev.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
 
-    file.text().then(txt => this.svc.loadFromText(txt));
-    input.value = '';
+    try {
+      const txt = await file.text();
+      this.svc.loadFromText(txt);
+      this.error.set(null);
+    } catch (err) {
+      this.error.set(err instanceof Error ? err.message : 'Could not read file.');
+    } finally {
+      input.value = '';
+    }
   }
 
   onShuffle() {
@@ -53,9 +60,12 @@ export class ControlsComponent {
   async onOpenFile(): Promise<void> {
     try {
       await this.svc.openFile();
+      this.error.set(null);
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') return;
-      throw err;
+      // ! Never re-throw here - re-throwing from an event hanlder becomes
+      //   an unhandled promise rejection with no UI feedback.
+      this.error.set(err instanceof Error ? err.message : 'Could not open file.');
     }
   }
 
@@ -69,6 +79,14 @@ export class ControlsComponent {
 
   onRemoveWinner(): void {
     this.svc.removeWinner();
+  }
+
+  get banner(): string | null {
+    return (
+      this.error() ??
+      this.svc.fileError() ??
+      (this.svc.popupBlocked() ? 'Popup blocked - allow popups for this site.' : null)
+    );
   }
 
   get count() {

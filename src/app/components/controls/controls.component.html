@@ -1,9 +1,16 @@
 <div role="region" aria-label="Controls">
+  @if (banner) {
+  <div class="banner" role="alert">{{ banner }}</div>
+  }
+
   <div class="toolbar">
     @if (supportsFileSystemAccess) {
     <button (click)="onOpenFile()">Open file</button>
     } @else {
     <input type="file" accept=".txt" (change)="onFileSelected($event)" />
+    <span class="fallback-note">
+      Real-time file sync requires Chrome or Edge.
+    </span>
     }
     <button (click)="onShuffle()" [disabled]="count === 0">Shuffle</button>
     <button (click)="onSpin()" [disabled]="count === 0">Spin</button>
