@@ -14,11 +14,13 @@ export class EntryService {
   readonly history = signal<WinnerRecord[]>([]);
   readonly supportsFileSystemAccess = 'showOpenFilePicker' in window;
   readonly fileError = signal<string | null>(null);
+  readonly popupBlocked = signal(false);
 
   private winCounter = 0;
   private writing = false;
   private pendingWrite = false;
   private fileHandle = signal<FileSystemFileHandle | null>(null);
+  private popupBlockedTimer: ReturnType<typeof setTimeout> | null = null;
 
   readonly hasFileHandle = computed(() => this.fileHandle() !== null);
   readonly isWinnerUrl = computed(() => this.winnerUrls().length > 0);
@@ -207,16 +209,26 @@ export class EntryService {
   }
 
   openInTab(url: string): void {
-    window.open(url, '_blank', 'noopener,noreferrer');
+    const w = window.open(url, '_blank', 'noopener,noreferrer');
+    if (!w) this.flagPopupBlocked();
   }
 
   searchWinnerOnGoogle(): void {
     const w = this.lastWinner();
     if (!w) return;
-    window.open(
+    const win = window.open(
       `https://www.google.com/search?q=${encodeURIComponent(w)}`,
       '_blank',
       'noopener,noreferrer',
     );
+    if (!win) this.flagPopupBlocked();
+  }
+
+  private flagPopupBlocked(): void {
+    this.popupBlocked.set(true);
+    if (this.popupBlockedTimer) clearTimeout(this.popupBlockedTimer);
+    // * Auto-clear after 5s so the banner does not linger after the user
+    //   has granted the popup permission and moved on.
+    this.popupBlockedTimer = setTimeout(() => this.popupBlocked.set(false), 5000);
   }
 }
