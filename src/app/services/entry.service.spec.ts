@@ -313,7 +313,7 @@ describe('EntryService', () => {
       expect(window.open).toHaveBeenCalledWith(
         'https://example.com',
         '_blank',
-        'noopener,noreferrer'
+        'noopener,noreferrer',
       );
     });
   });
@@ -328,7 +328,7 @@ describe('EntryService', () => {
       expect(window.open).toHaveBeenCalledWith(
         'https://www.google.com/search?q=hello%20world',
         '_blank',
-        'noopener,noreferrer'
+        'noopener,noreferrer',
       );
     });
 
@@ -364,11 +364,10 @@ describe('EntryService', () => {
         getFile: () => Promise.resolve(mockFile),
         createWritable: () =>
           Promise.resolve({ write: () => Promise.resolve(), close: () => Promise.resolve() }),
+        requestPermission: () => Promise.resolve('granted' as PermissionState),
       } as unknown as FileSystemFileHandle;
 
-      spyOn(window, 'showOpenFilePicker').and.returnValue(
-        Promise.resolve([mockHandle])
-      );
+      spyOn(window, 'showOpenFilePicker').and.returnValue(Promise.resolve([mockHandle]));
 
       await svc.openFile();
       expect(svc.entries()).toEqual(['Alice', 'Bob', 'Carol']);
@@ -380,11 +379,10 @@ describe('EntryService', () => {
         getFile: () => Promise.resolve(mockFile),
         createWritable: () =>
           Promise.resolve({ write: () => Promise.resolve(), close: () => Promise.resolve() }),
+        requestPermission: () => Promise.resolve('granted' as PermissionState),
       } as unknown as FileSystemFileHandle;
 
-      spyOn(window, 'showOpenFilePicker').and.returnValue(
-        Promise.resolve([mockHandle])
-      );
+      spyOn(window, 'showOpenFilePicker').and.returnValue(Promise.resolve([mockHandle]));
 
       expect(svc.hasFileHandle()).toBeFalse();
       await svc.openFile();

@@ -105,7 +105,8 @@ describe('ControlsComponent', () => {
 
     it('propagates non-abort errors', async () => {
       spyOn(svc, 'openFile').and.returnValue(Promise.reject(new Error('disk error')));
-      await expectAsync(comp.onOpenFile()).toBeRejected();
+      await comp.onOpenFile();
+      expect(comp.error()).toBe('disk error');
     });
   });
 
@@ -170,7 +171,7 @@ describe('ControlsComponent', () => {
       comp.onOpenInTab('https://example.com');
       expect(svc.openInTab).toHaveBeenCalledWith('https://example.com');
     });
-  })
+  });
 
   // ---- onSearchGoogle ----
 

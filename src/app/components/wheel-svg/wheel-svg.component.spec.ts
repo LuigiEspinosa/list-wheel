@@ -73,9 +73,9 @@ describe('WheelSvgComponent', () => {
 
     it('fits fewer characters per label when the font is larger (sparse wheel)', () => {
       const smallStep = comp.labelMaxChars(0.01); // small font -> more chars
-      const largeStep = comp.labelMaxChars(0.3);  // large font -> fewer chars
+      const largeStep = comp.labelMaxChars(0.3); // large font -> fewer chars
       expect(smallStep).toBeGreaterThanOrEqual(largeStep);
-    })
+    });
   });
 
   // ---- computed: n, step, angleDeg ----
@@ -163,10 +163,9 @@ describe('WheelSvgComponent', () => {
   // ---- spin ----
 
   describe('spin()', () => {
-    it('spins with a single-slot wheel when no entries are loaded', () => {
+    it('does not spin when no entries are loaded', () => {
       comp.spin();
-      expect(comp.spinning()).toBeTrue();
-      comp['stop']();
+      expect(comp.spinning()).toBeFalse();
     });
 
     it('does nothing if already spinning', () => {
