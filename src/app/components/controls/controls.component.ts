@@ -35,14 +35,6 @@ export class ControlsComponent {
     this.showHistory = !this.showHistory;
   }
 
-  onOpenInTab(url: string): void {
-    this.svc.openInTab(url);
-  }
-
-  onSearchGoogle(): void {
-    this.svc.searchWinnerOnGoogle();
-  }
-
   onRemoveWinner(): void {
     this.svc.removeWinner();
   }
@@ -86,11 +78,7 @@ export class ControlsComponent {
   }
 
   get banner(): string | null {
-    return (
-      this.error() ??
-      this.svc.fileError() ??
-      (this.svc.popupBlocked() ? 'Popup blocked - allow popups for this site.' : null)
-    );
+    return this.error() ?? this.svc.fileError();
   }
 
   get count() {
@@ -119,5 +107,9 @@ export class ControlsComponent {
 
   get isEditing(): boolean {
     return this.svc.isEditing();
+  }
+
+  get googleSearchUrl(): string | null {
+    return this.svc.googleSearchUrl();
   }
 }

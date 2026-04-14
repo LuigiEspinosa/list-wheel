@@ -14,14 +14,12 @@ export class EntryService {
   readonly history = signal<WinnerRecord[]>([]);
   readonly supportsFileSystemAccess = 'showOpenFilePicker' in window;
   readonly fileError = signal<string | null>(null);
-  readonly popupBlocked = signal(false);
   readonly isEditing = signal(false);
 
   private winCounter = 0;
   private writing = false;
   private pendingWrite = false;
   private fileHandle = signal<FileSystemFileHandle | null>(null);
-  private popupBlockedTimer: ReturnType<typeof setTimeout> | null = null;
 
   private static readonly MAX_BYTES = 20 * 1024 * 1024;
 
@@ -39,6 +37,12 @@ export class EntryService {
         return false;
       }
     });
+  });
+
+  readonly googleSearchUrl = computed(() => {
+    const w = this.lastWinner();
+    if (!w) return null;
+    return `https://www.google.com/search?q=${encodeURIComponent(w)}`;
   });
 
   loadFromText(raw: string) {
@@ -92,22 +96,6 @@ export class EntryService {
     this.lastWinner.set(null);
     this.history.set([]);
     this.winCounter = 0;
-  }
-
-  openInTab(url: string): void {
-    const w = window.open(url, '_blank', 'noopener,noreferrer');
-    if (!w) this.flagPopupBlocked();
-  }
-
-  searchWinnerOnGoogle(): void {
-    const w = this.lastWinner();
-    if (!w) return;
-    const win = window.open(
-      `https://www.google.com/search?q=${encodeURIComponent(w)}`,
-      '_blank',
-      'noopener,noreferrer',
-    );
-    if (!win) this.flagPopupBlocked();
   }
 
   /**
@@ -221,14 +209,6 @@ export class EntryService {
 
     await this.syncIfLinked();
     this.isEditing.set(false);
-  }
-
-  private flagPopupBlocked(): void {
-    this.popupBlocked.set(true);
-    if (this.popupBlockedTimer) clearTimeout(this.popupBlockedTimer);
-    // * Auto-clear after 5s so the banner does not linger after the user
-    //   has granted the popup permission and moved on.
-    this.popupBlockedTimer = setTimeout(() => this.popupBlocked.set(false), 5000);
   }
 
   private async finalizeWinner(text: string): Promise<void> {

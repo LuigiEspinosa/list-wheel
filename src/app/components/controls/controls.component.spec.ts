@@ -163,26 +163,6 @@ describe('ControlsComponent', () => {
     });
   });
 
-  // ---- onOpenInTab ----
-
-  describe('onOpenInTab', () => {
-    it('delegates to svc.openInTab() with the given URL', () => {
-      spyOn(svc, 'openInTab');
-      comp.onOpenInTab('https://example.com');
-      expect(svc.openInTab).toHaveBeenCalledWith('https://example.com');
-    });
-  });
-
-  // ---- onSearchGoogle ----
-
-  describe('onSearchGoogle', () => {
-    it('delegates to svc.searchWinnerOnGoogle()', () => {
-      spyOn(svc, 'searchWinnerOnGoogle');
-      comp.onSearchGoogle();
-      expect(svc.searchWinnerOnGoogle).toHaveBeenCalled();
-    });
-  });
-
   // ---- onRemoveWinner ----
 
   describe('onRemoveWinner', () => {
@@ -210,6 +190,7 @@ describe('ControlsComponent', () => {
   });
 
   // ---- onEdit ----
+
   describe('onEdit', () => {
     it('Edit button is disabled when the list is empty', () => {
       const btn = fixture.nativeElement.querySelector('button:nth-of-type(5)');
@@ -227,6 +208,51 @@ describe('ControlsComponent', () => {
     it('onEdit is a no-op when the list is empty', () => {
       comp.onEdit();
       expect(svc.isEditing()).toBeFalse();
+    });
+  });
+
+  // ---- winner link rendering ----
+
+  describe('winner link rendering', () => {
+    beforeEach(() => {
+      svc.loadFromText('Alice\nhttps://example.com');
+    });
+
+    it('renders a Google search anchor when the winner is plain text', () => {
+      svc.lastWinner.set('Alice');
+      fixture.detectChanges();
+      const a = fixture.nativeElement.querySelector('a.link-btn') as HTMLAnchorElement;
+      expect(a).not.toBeNull();
+      expect(a.getAttribute('href')).toContain('google.com/search');
+      expect(a.getAttribute('target')).toBe('_blank');
+      expect(a.getAttribute('rel')).toBe('noopener noreferrer');
+    });
+
+    it('renders a direct link anchor when the winner is a URL', () => {
+      svc.lastWinner.set('https://example.com');
+      fixture.detectChanges();
+      const a = fixture.nativeElement.querySelector('a.link-btn') as HTMLAnchorElement;
+      expect(a).not.toBeNull();
+      expect(a.getAttribute('href')).toContain('https://example.com');
+      expect(a.getAttribute('target')).toBe('_blank');
+      expect(a.getAttribute('rel')).toBe('noopener noreferrer');
+    });
+
+    it('does not render any link anchor when there is no winner', () => {
+      svc.lastWinner.set(null);
+      fixture.detectChanges();
+      const a = fixture.nativeElement.querySelector('a.link-btn') as HTMLAnchorElement;
+      expect(a).toBeNull();
+    });
+
+    it('clicking the anchor does not trigger any component click handler', () => {
+      svc.lastWinner.set('Alice');
+      fixture.detectChanges();
+      const a = fixture.nativeElement.querySelector('a.link-btn') as HTMLAnchorElement;
+      expect(a.getAttribute('ng-reflect-click')).toBeNull();
+      const comp = fixture.componentInstance as unknown as Record<string, unknown>;
+      expect(comp['onOpenInTab']).toBeUndefined();
+      expect(comp['onSearchGoogle']).toBeUndefined();
     });
   });
 });

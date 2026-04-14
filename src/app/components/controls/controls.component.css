@@ -6,7 +6,8 @@
 }
 
 .toolbar button,
-.buttons-row button {
+.buttons-row button,
+.buttons-row .link-btn {
   font-family: var(--font-ui);
   font-size: var(--fs-button);
   font-weight: 500;
@@ -17,6 +18,7 @@
   border: 1px solid var(--color-purple-muted-border);
   background: var(--color-purple-muted);
   color: var(--text-primary);
+  text-decoration: none;
   box-shadow: var(--shadow-inset);
   cursor: pointer;
   transition:
@@ -26,12 +28,14 @@
 }
 
 .toolbar button:hover:not(:disabled),
-.buttons-row button:hover:not(:disabled) {
+.buttons-row button:hover:not(:disabled),
+.buttons-row .link-btn:hover:not(:disabled) {
   box-shadow: var(--shadow-prominent);
 }
 
 .toolbar button:disabled,
-.buttons-row button:disabled {
+.buttons-row button:disabled,
+.buttons-row .link-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   box-shadow: none;

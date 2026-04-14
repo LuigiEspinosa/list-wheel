@@ -304,54 +304,31 @@ describe('EntryService', () => {
     });
   });
 
-  // ---- openInTab ----
+  // ---- googleSearchUrl ----
 
-  describe('openInTab', () => {
-    it('opens the given URL in a new tab', () => {
-      spyOn(window, 'open');
-      svc.openInTab('https://example.com');
-      expect(window.open).toHaveBeenCalledWith(
-        'https://example.com',
-        '_blank',
-        'noopener,noreferrer',
-      );
+  describe('googleSearchUrl', () => {
+    it('is null when there is no winner', () => {
+      expect(svc.googleSearchUrl()).toBeNull();
     });
-  });
 
-  // ---- searchWinnerOnGoogle ----
-
-  describe('searchWinnerOnGoogle', () => {
-    it('opens a Google search for the winner', () => {
-      spyOn(window, 'open');
+    it('builds a Google search URL for the current winner', () => {
       svc.lastWinner.set('hello world');
-      svc.searchWinnerOnGoogle();
-      expect(window.open).toHaveBeenCalledWith(
-        'https://www.google.com/search?q=hello%20world',
-        '_blank',
-        'noopener,noreferrer',
-      );
+      expect(svc.googleSearchUrl()).toBe('https://www.google.com/search?q=hello%20world');
     });
 
     it('encodes special characters', () => {
-      spyOn(window, 'open');
       svc.lastWinner.set('C++ is great & fast');
-      svc.searchWinnerOnGoogle();
-      const [url] = (window.open as jasmine.Spy).calls.mostRecent().args as [string];
+      const url = svc.googleSearchUrl();
       expect(url).toContain(encodeURIComponent('C++ is great & fast'));
     });
 
-    it('does not remove the entry', () => {
-      spyOn(window, 'open');
-      svc.loadFromText('Alice');
-      svc.lastWinner.set('Alice');
-      svc.searchWinnerOnGoogle();
-      expect(svc.entries()).toEqual(['Alice']);
-    });
-
-    it('does nothing when no winner', () => {
-      spyOn(window, 'open');
-      svc.searchWinnerOnGoogle();
-      expect(window.open).not.toHaveBeenCalled();
+    it('updates reactively when the winner changes', () => {
+      svc.lastWinner.set('first');
+      const a = svc.googleSearchUrl();
+      svc.lastWinner.set('second');
+      const b = svc.googleSearchUrl();
+      expect(a).not.toBe(b);
+      expect(b).toContain('second');
     });
   });
 
