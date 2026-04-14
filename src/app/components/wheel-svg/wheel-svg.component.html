@@ -27,12 +27,12 @@
     <circle r="3" fill="#422082"></circle>
 
     @if (svc.lastWinner()) {
-    <g text-anchor="middle">
-      <text x="0" y="1" font-size="3" font-weight="600" fill="#c2ef4e">Winner</text>
-      <text x="0" y="6" font-size="4.2" font-weight="700" fill="#ffffff">
-        {{ svc.lastWinner() }}
-      </text>
-    </g>
+    <foreignObject x="-30" y="-16" width="60" height="32" class="winner-fo">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="winner-badge" [attr.data-size]="winnerSize()" role="status">
+        <div class="winner-badge__label">Winner</div>
+        <div class="winner-badge__name">{{ svc.lastWinner() }}</div>
+      </div>
+    </foreignObject>
     }
   </svg>
 </div>

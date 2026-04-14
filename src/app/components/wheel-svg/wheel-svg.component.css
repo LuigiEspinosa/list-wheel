@@ -15,3 +15,60 @@ svg.wheel {
   height: 100%;
   display: block;
 }
+
+.winner-fo {
+  overflow: visible;
+}
+
+.winner-badge {
+  background: rgba(21, 15, 35, 0.94);
+  border: 0.4px solid #6a5fc1;
+  border-radius: 1.5px;
+  padding: 2px 3px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  text-align: center;
+  font-family: Rubik, system-ui, sans-serif;
+  color: #ffffff;
+  overflow: hidden;
+}
+
+.winner-badge__label {
+  color: #c2ef4e;
+  font-size: 2.4px;
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.winner-badge__name {
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1.15;
+  max-width: 100%;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.winner-badge[data-size='lg'] .winner-badge__name {
+  font-size: 4px;
+}
+.winner-badge[data-size='md'] .winner-badge__name {
+  font-size: 3.2px;
+}
+.winner-badge[data-size='sm'] .winner-badge__name {
+  font-size: 2.6px;
+}
+.winner-badge[data-size='xs'] .winner-badge__name {
+  font-size: 2px;
+}

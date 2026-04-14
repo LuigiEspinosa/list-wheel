@@ -46,6 +46,16 @@ export class WheelSvgComponent {
     return arr;
   });
 
+  readonly winnerSize = computed<'lg' | 'md' | 'sm' | 'xs'>(() => {
+    const w = this.svc.lastWinner();
+    if (!w) return 'sm';
+    const len = w.length;
+    if (len <= 12) return 'lg';
+    if (len <= 24) return 'md';
+    if (len <= 40) return 'sm';
+    return 'xs';
+  });
+
   constructor() {
     effect(() => {
       const list = this.svc.entries();
