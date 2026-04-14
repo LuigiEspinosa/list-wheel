@@ -4,7 +4,7 @@ A browser-based spin wheel that picks winners from any plain-text list. Load a `
 
 Winners are progressively removed from the source file on disk in real time via the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API), so the pool stays in sync without re-uploading.
 
-> **Live demo:** https://luigiespinosa.github.io/list-wheel/
+> **Live demo:** <https://luigiespinosa.github.io/list-wheel/>
 
 ## Highlights
 
@@ -60,6 +60,10 @@ sequenceDiagram
     Svc->>Svc: history.update()
 ```
 
+## Design
+
+Dark-only UI built from a Sentry-inspired design system. All CSS variables are declared in `src/styles/tokens.css` and consumed component-side by name.
+
 ## Tech stack
 
 | Concern        | Solution                                        |
@@ -72,6 +76,7 @@ sequenceDiagram
 | **RNG**        | Mulberry32, seeded from crypto.getRandomValues. |
 | **Testing**    | Karma + Jasmine + ChromeHeadless.               |
 | **Deployment** | angular-cli-ghpages.                            |
+| **Tokens**     | CSS variables in `src/styles/tokens.css`.       |
 
 ## Local development
 
