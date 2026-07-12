@@ -15,6 +15,11 @@ export class EntryService {
   readonly supportsFileSystemAccess = 'showOpenFilePicker' in window;
   readonly fileError = signal<string | null>(null);
   readonly isEditing = signal(false);
+  // * Shared toolbar state: when true, Spin resolves a winner instantly with
+  //   no animation. Lives here (like isEditing) so both Controls and the wheel
+  //   read the same signal without an @Input/@Output chain. Off by default so
+  //   first-time visitors see the wheel animate - the app's whole point.
+  readonly instantResults = signal(false);
 
   private winCounter = 0;
   private writing = false;

@@ -101,6 +101,27 @@
   letter-spacing: var(--ls-caps);
 }
 
+.instant-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-ui);
+  font-size: var(--fs-button);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--ls-caps);
+  cursor: pointer;
+}
+
+.instant-toggle input[type='checkbox']:not(:disabled) {
+  cursor: pointer;
+}
+
+.instant-toggle:has(input:disabled) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .results {
   display: flex;
   flex-direction: column;

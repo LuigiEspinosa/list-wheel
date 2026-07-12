@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, signal } from '@angular/core';
 import { EntryService } from '../../services/entry.service';
 
 @Component({
@@ -7,10 +7,20 @@ import { EntryService } from '../../services/entry.service';
   templateUrl: './wheel-svg.component.html',
   styleUrls: ['./wheel-svg.component.css'],
 })
-export class WheelSvgComponent {
+export class WheelSvgComponent implements OnDestroy {
   private angularVelocity = 0;
   private rafId: number | null = null;
   private lastFingerprint = '';
+  // * Flipped on every winner announcement so a repeat winner still registers
+  //   as a text change in the aria-live region (see settleOnIndex).
+  private liveNonce = false;
+
+  // * Per-frame angular-velocity decay (normalized to 60fps). Roughly the
+  //   square of the previous 0.995 (0.995² ≈ 0.990025 ≈ 0.99), which halves
+  //   the wall-clock stop time for any initial velocity while preserving the
+  //   deceleration feel and the resting-angle selection math. See story 3.1
+  //   Dev Notes for the derivation.
+  private readonly SPIN_FRICTION = 0.99;
 
   readonly rStart = 12;
   readonly rEnd = 46;
@@ -56,7 +66,31 @@ export class WheelSvgComponent {
     return 'xs';
   });
 
+  // * Finalize an in-flight spin when the tab is hidden. RAF is throttled while
+  //   backgrounded, so friction barely applies and the wheel would otherwise
+  //   resume still spinning on return. Guarded on spinning() so it is a no-op
+  //   when idle. Stored as a field so add/removeEventListener use one reference.
+  private onVisibility = () => {
+    if (document.hidden && this.spinning()) {
+      this.stop();
+      // * Finalize to a fresh random winner rather than snapping to the frozen
+      //   angle. RAF is paused when backgrounded, so this.angle() is arbitrary
+      //   mid-motion - and if the tab is hidden before the first frame it is
+      //   still the pre-spin value, which snapAndPickWinner would resolve
+      //   deterministically (to the previous winner). A random pick keeps the
+      //   outcome fair regardless of tab-switch timing.
+      const n = this.svc.entries().length;
+      if (n === 0) {
+        this.svc.lastWinner.set(null);
+        return;
+      }
+      this.settleOnIndex(Math.floor(Math.random() * n));
+    }
+  };
+
   constructor() {
+    document.addEventListener('visibilitychange', this.onVisibility);
+
     effect(() => {
       const list = this.svc.entries();
       // * Fingerprint distinguishes load/clear from shuffle, Shuffles keep
@@ -72,6 +106,11 @@ export class WheelSvgComponent {
       this.angle.set(0);
       this.svc.lastWinner.set(null);
     });
+  }
+
+  ngOnDestroy() {
+    this.stop();
+    document.removeEventListener('visibilitychange', this.onVisibility);
   }
 
   fitLabel(text: string, maxChars: number) {
@@ -102,6 +141,16 @@ export class WheelSvgComponent {
 
   spin() {
     if (this.spinning() || this.svc.entries().length === 0) return;
+
+    // * Instant mode: pick a uniformly-random winner and settle on it with no
+    //   animation. spinning() never flips true and no RAF loop starts.
+    if (this.svc.instantResults()) {
+      const n = this.svc.entries().length;
+      const idx = Math.floor(Math.random() * n);
+      this.settleOnIndex(idx);
+      return;
+    }
+
     const turns = 4 + Math.random() * 4;
     const spinDuration = 4 + Math.random() * 1;
     this.angularVelocity = (turns * 2 * Math.PI) / spinDuration;
@@ -110,7 +159,7 @@ export class WheelSvgComponent {
   }
 
   private animate() {
-    const friction = 0.995;
+    const friction = this.SPIN_FRICTION;
     const start = performance.now();
     const tick = (now: number, last: number) => {
       // * Clamp dt so a background tab (RAF pauses) cannot jump the whell
@@ -152,6 +201,24 @@ export class WheelSvgComponent {
     if (pointerAngle < 0) pointerAngle += 2 * Math.PI;
 
     const idx = Math.floor(pointerAngle / step) % n;
+    this.settleOnIndex(idx);
+  }
+
+  /**
+   * Finalize on a chosen segment: record the winner, orient the wheel so the
+   * pointer points at that segment's center, and update the aria-live region.
+   * Shared by the animated end (idx derived from resting angle) and instant
+   * mode (idx chosen at random) so the pointer-alignment and screen-reader
+   * logic exist in exactly one place.
+   */
+  private settleOnIndex(idx: number) {
+    const list = this.entries();
+    const n = list.length;
+    if (n === 0) {
+      this.svc.lastWinner.set(null);
+      return;
+    }
+    const step = (2 * Math.PI) / n;
     const winner = list[idx] ?? null;
     this.svc.lastWinner.set(winner);
 
@@ -160,8 +227,14 @@ export class WheelSvgComponent {
     this.angle.set(targetWheelAngle);
 
     // * Screen readers - the aria-live region lives in app.component.html
-    //   and is the only non-visual cue that the wheel settled.
+    //   and is the only non-visual cue that the wheel settled. Toggle a
+    //   trailing zero-width space so a repeat winner still differs from the
+    //   previous text and is re-announced (common in instant mode, where
+    //   rapid spins can draw the same name twice in a row).
     const live = document.getElementById('winner-live');
-    if (live && winner) live.textContent = `Winner: ${winner}`;
+    if (live && winner) {
+      this.liveNonce = !this.liveNonce;
+      live.textContent = `Winner: ${winner}${this.liveNonce ? '​' : ''}`;
+    }
   }
 }

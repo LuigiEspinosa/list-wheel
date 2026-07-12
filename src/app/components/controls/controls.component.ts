@@ -17,6 +17,14 @@ export class ControlsComponent {
   showHistory = false;
   readonly error = signal<string | null>(null);
 
+  get instantResults(): boolean {
+    return this.svc.instantResults();
+  }
+
+  onToggleInstant(ev: Event): void {
+    this.svc.instantResults.set((ev.target as HTMLInputElement).checked);
+  }
+
   onShuffle() {
     this.svc.shuffle();
   }

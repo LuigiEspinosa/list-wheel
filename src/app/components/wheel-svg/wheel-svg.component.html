@@ -28,7 +28,7 @@
 
     @if (svc.lastWinner()) {
     <foreignObject x="-30" y="-16" width="60" height="32" class="winner-fo">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="winner-badge" [attr.data-size]="winnerSize()" role="status">
+      <div xmlns="http://www.w3.org/1999/xhtml" class="winner-badge" [attr.data-size]="winnerSize()" aria-hidden="true">
         <div class="winner-badge__label">Winner</div>
         <div class="winner-badge__name">{{ svc.lastWinner() }}</div>
       </div>

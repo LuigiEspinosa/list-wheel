@@ -211,6 +211,51 @@ describe('ControlsComponent', () => {
     });
   });
 
+  // ---- instant results toggle ----
+
+  describe('instant results toggle', () => {
+    afterEach(() => svc.instantResults.set(false));
+
+    it('getter reflects the service signal', () => {
+      svc.instantResults.set(true);
+      expect(comp.instantResults).toBeTrue();
+      svc.instantResults.set(false);
+      expect(comp.instantResults).toBeFalse();
+    });
+
+    it('onToggleInstant updates the service signal', () => {
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+
+      input.checked = false;
+      comp.onToggleInstant({ target: input } as unknown as Event);
+      expect(svc.instantResults()).toBeFalse();
+
+      input.checked = true;
+      comp.onToggleInstant({ target: input } as unknown as Event);
+      expect(svc.instantResults()).toBeTrue();
+    });
+
+    it('renders a checkbox that reflects instantResults() and is unchecked by default', () => {
+      const checkbox = fixture.nativeElement.querySelector(
+        'input[type="checkbox"]'
+      ) as HTMLInputElement;
+      expect(checkbox).not.toBeNull();
+      expect(checkbox.checked).toBeFalse();
+    });
+
+    it('disables the checkbox while editing', () => {
+      svc.loadFromText('Alice');
+      svc.isEditing.set(true);
+      fixture.detectChanges();
+      const checkbox = fixture.nativeElement.querySelector(
+        'input[type="checkbox"]'
+      ) as HTMLInputElement;
+      expect(checkbox.disabled).toBeTrue();
+      svc.isEditing.set(false);
+    });
+  });
+
   // ---- winner link rendering ----
 
   describe('winner link rendering', () => {

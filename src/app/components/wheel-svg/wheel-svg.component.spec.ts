@@ -163,6 +163,9 @@ describe('WheelSvgComponent', () => {
   // ---- spin ----
 
   describe('spin()', () => {
+    // Instant mode is on by default; these tests exercise the animated path.
+    beforeEach(() => svc.instantResults.set(false));
+
     it('does not spin when no entries are loaded', () => {
       comp.spin();
       expect(comp.spinning()).toBeFalse();
@@ -191,6 +194,66 @@ describe('WheelSvgComponent', () => {
       comp.spin();
       expect(comp['angularVelocity']).toBe(velocityAfterFirst);
       comp['stop']();
+    });
+  });
+
+  // ---- instant results mode ----
+
+  describe('instant results mode', () => {
+    beforeEach(() => svc.instantResults.set(true));
+
+    it('picks a winner immediately without ever spinning', () => {
+      svc.loadFromText('Alice\nBob\nCarol');
+      comp.spin();
+      expect(comp.spinning()).toBeFalse();
+      expect(comp['angularVelocity']).toBe(0);
+      const winner = svc.lastWinner();
+      expect(winner).not.toBeNull();
+      expect(['Alice', 'Bob', 'Carol']).toContain(winner as string);
+    });
+
+    it('does not start a RAF loop', () => {
+      svc.loadFromText('Alice\nBob');
+      comp.spin();
+      expect(comp['rafId']).toBeNull();
+    });
+
+    it('orients the wheel so the pointer lands on the chosen winner', () => {
+      svc.loadFromText('Alice\nBob\nCarol\nDave');
+      comp.spin();
+      const winner = svc.lastWinner();
+      const idx = svc.entries().indexOf(winner as string);
+      const step = (2 * Math.PI) / svc.entries().length;
+      const expected = -((idx + 0.5) * step + Math.PI / 2);
+      expect(comp.angle()).toBeCloseTo(expected);
+    });
+  });
+
+  // ---- visibilitychange (background-tab fix) ----
+
+  describe('visibilitychange', () => {
+    it('finalizes a mid-spin animation when the tab is hidden', () => {
+      svc.instantResults.set(false);
+      svc.loadFromText('Alice\nBob\nCarol');
+      comp.spin();
+      expect(comp.spinning()).toBeTrue();
+
+      spyOnProperty(document, 'hidden', 'get').and.returnValue(true);
+      document.dispatchEvent(new Event('visibilitychange'));
+
+      expect(comp.spinning()).toBeFalse();
+      expect(svc.lastWinner()).not.toBeNull();
+    });
+
+    it('is a no-op when the tab is hidden while the wheel is idle', () => {
+      svc.loadFromText('Alice\nBob');
+      svc.lastWinner.set(null);
+
+      spyOnProperty(document, 'hidden', 'get').and.returnValue(true);
+      document.dispatchEvent(new Event('visibilitychange'));
+
+      expect(comp.spinning()).toBeFalse();
+      expect(svc.lastWinner()).toBeNull();
     });
   });
 
