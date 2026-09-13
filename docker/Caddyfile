@@ -1,0 +1,35 @@
+# The container's own server, and only that. This is NOT the wheel.cuatro.dev
+# site block. TLS, the Cloudflare Origin CA certificate and the response headers
+# all live in the shared Caddyfile on the box (/home/deploy/cs-tracker/Caddyfile,
+# read by the one Caddy that owns ports 80 and 443 for the whole estate), which
+# reverse-proxies the hostname to this container by its compose alias. This file
+# is what `caddy:2` inside the image reads: plain HTTP on :80, static files,
+# nothing else.
+#
+# `try_files {path} /index.html` keeps what GitHub Pages did until 2026-09-13,
+# where `404.html` was a byte-identical copy of `index.html`: any unknown path
+# gets the application. The application has no routes, so this is the whole
+# fallback and it stays one line (Story 2-25, AD-20).
+#
+# Indentation is tabs, which is what `caddy fmt` produces.
+
+:80 {
+	root * /srv
+	file_server
+	try_files {path} /index.html
+}
+
+# For the record: the wheel.cuatro.dev site block as appended to the shared
+# Caddyfile on the box by Story 2-25, and mirrored in cuatro-portfolio's
+# ops/routing-inventory.md. Nothing reads it from here. It is reproduced so the
+# image is self-describing and the record has a source in this repository.
+#
+# wheel.cuatro.dev {
+# 	tls /data/origin-ca/origin.pem /data/origin-ca/origin.key
+# 	header {
+# 		X-Content-Type-Options "nosniff"
+# 		X-Frame-Options "DENY"
+# 		Referrer-Policy "strict-origin-when-cross-origin"
+# 	}
+# 	reverse_proxy list-wheel:80
+# }

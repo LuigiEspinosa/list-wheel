@@ -1,0 +1,51 @@
+# list-wheel runs as a sibling stack on the Hostinger VPS beside cuatro-portfolio
+# and cs-tracker, not as a standalone host. One shared Caddy (cs-tracker-caddy-1)
+# owns ports 80 and 443 for the whole estate, so nothing here publishes a port
+# and nothing here terminates TLS. That Caddy reaches this container over the
+# external network below, under the alias its wheel.cuatro.dev site block
+# reverse-proxies by name (docker/Caddyfile records that block).
+#
+# `cs-tracker_default` is declared external on purpose. On a box where that
+# network does not exist, `docker compose up` fails immediately instead of
+# quietly standing up a stack nothing can route to.
+#
+# THE SERVICE IS NAMED `list-wheel`, AND THAT IS LOAD-BEARING. Compose gives a
+# service its own name as a DNS alias on every network it joins, and the shared
+# network already answers to `app`, `db`, `web`, `api` and `worker` from other
+# stacks; a service here called `app` or `web` would take a second lease on a
+# name the shared Caddyfile already reverse-proxies, which is exactly what
+# cuatro-portfolio observed on 2026-08-17. `list-wheel` is this application's
+# id in the Cuatro Registry (AD-3: the compose service and the router are the
+# id) and collides with nothing on that network. Do not rename it.
+name: list-wheel
+
+services:
+  list-wheel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      # Only the shared network. The container serves static files and reaches
+      # nothing else.
+      cs-tracker_default:
+        aliases:
+          - list-wheel
+    healthcheck:
+      # Without this, a build that produces an image Caddy cannot serve from
+      # still reports as running and only the external probe notices.
+      #
+      # 127.0.0.1 is right here, unlike in the Anchor's probe. Caddy's `:80`
+      # site binds every interface, so loopback answers; the Anchor's Next
+      # server binds its container hostname alone, which is why its probe reads
+      # `process.env.HOSTNAME` and this one does not. busybox `wget` ships in
+      # `caddy:2`; there is no curl and no node in the image.
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1/ || exit 1']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+networks:
+  cs-tracker_default:
+    external: true
