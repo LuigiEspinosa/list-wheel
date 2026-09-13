@@ -1,7 +1,9 @@
 # The deploy builds in /home/deploy/list-wheel with `COPY . .`, so everything
-# not listed here lands in the build stage's layer in the box's image cache. The
-# serving stage copies only dist/list-wheel/browser forward, so the served image
-# is clean either way; this keeps the context and that layer small.
+# not listed here lands in the build stage's layer in the box's image cache and
+# invalidates that layer when it changes. The serving stage copies only
+# dist/list-wheel/browser forward, so the served image is clean either way; this
+# keeps the context and that layer small and the layer stable across edits to
+# files the build never reads.
 #
 # From .gitignore: the compiled output and the Angular cache. A checkout on the
 # box has neither, but a local `docker build` after an `ng build` would send a
@@ -14,11 +16,12 @@ node_modules
 coverage
 
 .git
+.github
 .gitignore
 .vscode
 
 *.md
-!README.md
+*.excalidraw
 
 Dockerfile
 docker-compose.yml
