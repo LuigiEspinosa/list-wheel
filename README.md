@@ -4,7 +4,7 @@ A browser-based spin wheel that picks winners from any plain-text list. Load a `
 
 Winners are progressively removed from the source file on disk in real time via the [File System Access API](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API), so the pool stays in sync without re-uploading.
 
-> **Live demo:** <https://luigiespinosa.github.io/list-wheel/>
+> **Live demo:** <https://wheel.cuatro.dev/>
 
 ## Highlights
 
@@ -69,17 +69,17 @@ Dark-only UI built from a Sentry-inspired design system. All CSS variables are d
 
 ## Tech stack
 
-| Concern        | Solution                                        |
-| -------------- | ----------------------------------------------- |
-| **Framework**  | Angular 20, standalone components.              |
-| **Build**      | @angular/build (esbuild).                       |
-| **State**      | signal, computed, effect.                       |
-| **Rendering**  | Pure SVG.                                       |
-| **File I/O**   | File System Access API.                         |
-| **RNG**        | Mulberry32, seeded from crypto.getRandomValues. |
-| **Testing**    | Karma + Jasmine + ChromeHeadless.               |
-| **Deployment** | angular-cli-ghpages.                            |
-| **Tokens**     | CSS variables in `src/styles/tokens.css`.       |
+| Concern        | Solution                                                               |
+| -------------- | ---------------------------------------------------------------------- |
+| **Framework**  | Angular 20, standalone components.                                     |
+| **Build**      | @angular/build (esbuild).                                              |
+| **State**      | signal, computed, effect.                                              |
+| **Rendering**  | Pure SVG.                                                              |
+| **File I/O**   | File System Access API.                                                |
+| **RNG**        | Mulberry32, seeded from crypto.getRandomValues.                        |
+| **Testing**    | Karma + Jasmine + ChromeHeadless.                                      |
+| **Deployment** | Docker, behind the shared Caddy on cuatro.dev's box, via `deploy.yml`. |
+| **Tokens**     | CSS variables in `src/styles/tokens.css`.                              |
 
 ## Local development
 
