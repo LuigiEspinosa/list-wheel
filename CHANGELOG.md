@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## [2026-09-13]
+
+### Changed
+
+- Hosting: the application serves from <https://wheel.cuatro.dev/>. A two-stage Docker image (`node:22-slim` builds, `caddy:2` serves) is placed behind the shared Caddy on cuatro.dev's box by `.github/workflows/deploy.yml` on every push to `main`, after the estate's Capacity Gate passes.
+- The old URL, <https://luigiespinosa.github.io/list-wheel/>, redirects to the new one: `gh-pages` now holds a `meta refresh` page that carries the query string and hash across.
+
+### Removed
+
+- The `deploy` script and `angular-cli-ghpages`. The workflow is the deploy now, and a script that republishes to Pages would undo the redirect.
+
 ## [2026-04-14]
 
 ### Added

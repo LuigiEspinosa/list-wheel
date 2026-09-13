@@ -1,0 +1,25 @@
+# The deploy builds in /home/deploy/list-wheel with `COPY . .`, so everything
+# not listed here lands in the build stage's layer in the box's image cache. The
+# serving stage copies only dist/list-wheel/browser forward, so the served image
+# is clean either way; this keeps the context and that layer small.
+#
+# From .gitignore: the compiled output and the Angular cache. A checkout on the
+# box has neither, but a local `docker build` after an `ng build` would send a
+# stale dist/ that the build stage then overwrites anyway.
+dist
+.angular
+# `npm ci` in the build stage installs a clean tree. A host node_modules sent
+# with the context would be copied over it by `COPY . .`.
+node_modules
+coverage
+
+.git
+.gitignore
+.vscode
+
+*.md
+!README.md
+
+Dockerfile
+docker-compose.yml
+.dockerignore
