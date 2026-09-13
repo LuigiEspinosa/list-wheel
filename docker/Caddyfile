@@ -11,12 +11,24 @@
 # gets the application. The application has no routes, so this is the whole
 # fallback and it stays one line (Story 2-25, AD-20).
 #
+# The shell (`index.html`, however it was reached) is `no-cache` so a browser
+# revalidates it on every visit (the ETag makes that a 304) instead of applying
+# heuristic freshness and, weeks after a redeploy, asking for hashed bundles
+# the new image no longer has; the hashed assets keep Caddy's default caching.
+# `route` fixes the order: Caddy runs `header` before `try_files` otherwise, so
+# the matcher would see `/no/such/path` unrewritten and that response would
+# ship without the header.
+#
 # Indentation is tabs, which is what `caddy fmt` produces.
 
 :80 {
 	root * /srv
-	file_server
-	try_files {path} /index.html
+	@shell path / /index.html
+	route {
+		try_files {path} /index.html
+		header @shell Cache-Control "no-cache"
+		file_server
+	}
 }
 
 # For the record: the wheel.cuatro.dev site block as appended to the shared
