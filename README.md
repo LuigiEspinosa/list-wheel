@@ -87,6 +87,7 @@ Dark-only UI built from a Sentry-inspired design system. All CSS variables are d
 npm install
 npm start     # http://localhost:4200
 npm test      # single headless Karma run
+node --test ops/deploy-remote.test.mjs  # the deploy script and workflow; needs bash and git
 
 # WSL users: Karma needs a Chrome binary. Run this once, then restart your shell:
 

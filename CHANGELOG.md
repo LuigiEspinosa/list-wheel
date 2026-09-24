@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## [2026-09-24]
+
+### Changed
+
+- Deploy: `.github/workflows/deploy.yml` runs the suite in a `test` job first and deploys only when it passes, so a red suite stops the deploy before the box is touched. One deploy runs at a time, a push that changes only Markdown no longer deploys, and a redeploy of `main` can be started by hand with `workflow_dispatch`.
+- The box runs `ops/deploy-remote.sh`, which deploys only a full commit sha already on `main`, and resets to that sha rather than to wherever `main` has moved by then. Once the deploy key is restricted on the box, that script is all the key can run.
+- A failed run, the suite's included, opens a GitHub issue. The workflow's token is read-only except in the job that opens it, and `appleboy/ssh-action` is pinned to a commit.
+
 ## [2026-09-13]
 
 ### Changed
