@@ -1,0 +1,8 @@
+# Line endings for the files that leave this repository and run somewhere else.
+#
+# `ops/deploy-remote.sh` runs under bash, on the box and in `ops/deploy-remote.test.mjs`.
+# `core.autocrlf` is true on the authoring machine, so without this rule a checkout there holds it
+# with CRLF endings, and bash fails with `$'\r': command not found`. Deliberately narrow, as in
+# cuatro-portfolio: a repository-wide `* text=auto` would renormalise files no change has touched.
+
+*.sh text eol=lf

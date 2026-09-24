@@ -18,7 +18,10 @@ coverage
 .git
 .github
 .gitignore
+.gitattributes
 .vscode
+# The deploy script and its test run on the box and in CI, never in the image.
+ops
 
 *.md
 *.excalidraw
