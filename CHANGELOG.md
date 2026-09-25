@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [2026-09-25]
+
+### Fixed
+
+- Deploy: `ops/deploy-remote.sh` refuses a commit on `main` older than itself. A reset to one deleted the script the deploy key's forced command names, so every later deploy failed until the checkout was repaired by hand.
+
 ## [2026-09-24]
 
 ### Changed

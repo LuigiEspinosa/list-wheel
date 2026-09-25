@@ -331,6 +331,16 @@ describe('ops/deploy-remote.sh, as the box runs it', () => {
     });
   }
 
+  // DW-131: A is on `main` but predates the script, so a reset to it would delete the file the key's forced
+  // command names, and every later deploy would fail until the checkout was repaired by hand.
+  it('refuses a commit on main that predates the script, leaving the checkout where it was', () => {
+    const box = deploy({ start: 'B', mode: 'forced', command: commandFor(shas.A) });
+    assert.equal(box.status, 1);
+    assert.ok(box.stderr.includes(`deploy-remote: refused: ${shas.A} carries no ops/deploy-remote.sh`), box.stderr);
+    assert.equal(box.head, shas.B);
+    assert.deepEqual(box.docker, []);
+  });
+
   // The workflow sees only the SSH step's exit status, so a failed compose has to reach it through the
   // login shell, which is what fails the job and runs the report (DW-20).
   it('fails the session when compose fails, after the reset', () => {

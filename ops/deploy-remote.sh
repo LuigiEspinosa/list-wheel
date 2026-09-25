@@ -3,7 +3,7 @@
 # from it. `.github/workflows/deploy.yml` reaches it over SSH, and it is the forced command of that
 # workflow's key once the Operator applies Pending Operator action 9 of `ops/contract-serving.md` in
 # LuigiEspinosa/cuatro-portfolio (DW-94, Operator ruling 2026-09-24). It mirrors that repository's
-# `ops/deploy-remote.sh` as of `b0aeaff` and differs in the checkout it resets and the compose line.
+# `ops/deploy-remote.sh` as of `6e9a216` and differs in the checkout it resets and the compose line.
 #
 # It takes one input, the target commit, from one of two places.
 #
@@ -15,10 +15,12 @@
 #   sshd runs this file in place of whatever the client asked for and hands the request over in that
 #   variable. Its last word is read as the sha, and nothing in it is executed.
 #
-# Either way the target is refused unless it is 40 lowercase hex characters and an ancestor of
-# `origin/main` after a fetch, so a leaked key can redeploy a commit already on `main` and do nothing
-# else. The sha stays the last word of the workflow's command string, and this file stays at this
-# path, because the key's line names it. Story 4.3, which retires the build on the box, edits this
+# Either way the target is refused unless it is 40 lowercase hex characters, an ancestor of
+# `origin/main` after a fetch, and a commit that carries this file, so a leaked key can redeploy a
+# commit already on `main` and do nothing else. A commit older than this file is refused because a
+# reset to it deletes the file the key's line names and stops every later deploy (DW-131). The sha
+# stays the last word of the workflow's command string, and this file stays at this path, because
+# the key's line names it. Story 4.3, which retires the build on the box, edits this
 # file. `ops/deploy-remote.test.mjs` runs it both ways against a scratch repository, and reads the
 # line above as the forced command.
 
@@ -44,6 +46,7 @@ main() {
   # checkout's fetch configuration, and without `+`, so a rewritten `main` fails the deploy.
   git fetch origin main:refs/remotes/origin/main
   git merge-base --is-ancestor "$target" origin/main || refuse "$target is not on origin/main"
+  git cat-file -e "$target:ops/deploy-remote.sh" || refuse "$target carries no ops/deploy-remote.sh"
   echo "deploy-remote: deploying $target, read from $source"
 
   # `reset --hard` rather than `pull`: a pull fails or merges if the box checkout has drifted, and a
