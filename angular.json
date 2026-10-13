@@ -22,7 +22,12 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles/tokens.css", "src/styles.css"]
+            "styles": [
+              "src/styles/cuatro-contracts/tokens.css",
+              "src/styles/cuatro-contracts/fonts.css",
+              "src/styles/tokens.css",
+              "src/styles.css"
+            ]
           },
           "configurations": {
             "production": {
@@ -75,7 +80,12 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.css"]
+            "styles": [
+              "src/styles/cuatro-contracts/tokens.css",
+              "src/styles/cuatro-contracts/fonts.css",
+              "src/styles/tokens.css",
+              "src/styles.css"
+            ]
           }
         }
       }

@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [2026-10-13]
+
+### Changed
+
+- Adopts the Cuatro Ecosystem token contract v2.0.0: `src/styles/cuatro-contracts/` is a byte-identical copy of the nine published contract files, loaded ahead of the application's styles, and the three faces (Bricolage Grotesque, Geist, Geist Mono) come from its own woff2 files. The Google Fonts stylesheet and Rubik are gone. `color-scheme: dark`, the accent `::selection`, the contract's focus ring and square form controls are set globally.
+
 ## [2026-09-25]
 
 ### Fixed

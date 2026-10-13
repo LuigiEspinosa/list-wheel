@@ -11,13 +11,25 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-::selection {
-  background-color: var(--color-purple);
-  color: var(--text-primary);
+/* The contract's hand-fix lines 1 to 4, in order (EXPERIENCE.md, the hand-fix list). */
+:root {
+  color-scheme: dark;
 }
 
-*:focus-visible {
-  outline: 0.125rem solid var(--color-purple);
-  outline-offset: 2px;
-  border-radius: var(--radius-input);
+::selection {
+  background-color: var(--token-accent);
+  color: var(--token-bg);
+}
+
+:focus-visible {
+  outline: var(--stroke-focus) solid var(--token-focus);
+  outline-offset: var(--focus-offset);
+  border-radius: var(--r-hair);
+}
+
+button,
+input,
+select,
+textarea {
+  border-radius: var(--r-none);
 }

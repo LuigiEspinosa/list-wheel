@@ -1,12 +1,11 @@
 # Two stages, in the Anchor's shape (cuatro-portfolio/docker/Dockerfile): one
 # builds, one serves, and the served image carries no node at all.
 #
-# The build stage needs HTTPS egress. `src/index.html` links a Google Fonts
-# stylesheet and `ng build` inlines that CSS into the output at build time, so a
-# build with no route to fonts.googleapis.com fails rather than degrades. That
-# is the same egress the GitHub Pages build had; it is stated here because the
-# build now runs on the box, a knowing breach of the estate's AD-8 recorded as
-# KV-1 in cuatro-portfolio's ops/known-violations.md and retired by Story 4.3.
+# The build stage needs HTTPS egress for `npm ci` only. The fonts are the
+# vendored contract's own woff2 files (src/styles/cuatro-contracts/), which
+# `ng build` copies into the output, so no font host is fetched at build time.
+# It is stated here because the build runs on the box, a knowing breach of the
+# estate's AD-8 recorded as KV-1 in cuatro-portfolio's ops/known-violations.md.
 #
 # `node:22-slim`: @angular/cli 20.3 requires node ^20.19 || ^22.12 || >=24, and
 # 22 is the Anchor's base. Floating major, like every image in the estate.
