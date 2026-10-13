@@ -1,70 +1,58 @@
-:host,
-html,
-body {
-  font-family: var(--font-ui);
-  height: 100%;
-}
-
 main.layout {
   display: grid;
   grid-template-rows: auto auto 1fr;
-  gap: 1.5rem;
-  padding: 2rem;
-  max-width: 1152px;
+  gap: var(--s-lg);
+  padding: var(--page-pad);
+  max-width: 72rem;
   margin: 0 auto;
 }
 
-@media (min-width: 640px) {
+/* The one breakpoint (RESTYLE-SPEC.md § 2). */
+@media (min-width: 760px) {
   main.layout {
-    padding: 4rem;
-    gap: 2rem;
+    gap: var(--s-xl);
   }
 }
 
+/* § 6 Display: the one display line on the page. */
 .header h1 {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: var(--fs-display-2);
-  font-weight: 700;
-  line-height: var(--lh-tight);
-  color: var(--text-primary);
-}
-
-@media (min-width: 768px) {
-  .header h1 {
-    font-size: var(--fs-hero);
-  }
+  color: var(--token-text);
+  font-family: var(--f-display);
+  font-stretch: 100%;
+  font-size: var(--t-display);
+  font-weight: var(--w-black);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+  text-transform: uppercase;
 }
 
 .header p {
-  margin: 0.5rem 0 0;
-  font-size: var(--fs-body);
-  color: var(--text-secondary);
-  max-width: 60ch;
+  margin: var(--s-sm) 0 0;
+  max-width: var(--measure);
+  color: var(--token-text-secondary);
+  font-size: var(--t-base);
+  line-height: var(--lh-lede);
+}
+
+/* No box: a hairline between sibling sections (§ 3), none above the first. */
+.panel,
+.wheel-wrap,
+.editor-wrap {
+  border-top: var(--stroke-hair) solid var(--token-border);
+  padding-top: var(--s-lg);
 }
 
 .panel {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  background: var(--glass-white);
-  backdrop-filter: blur(18px) saturate(180%);
-  -webkit-backdrop-filter: blur(18px) saturate(180%);
-  border: 1px solid var(--bg-border);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-elevated);
-  padding: 1.5rem;
+  gap: var(--s-md);
 }
 
 .wheel-wrap {
   min-height: 480px;
   display: grid;
   place-items: center;
-  border: 1px solid var(--bg-border);
-  background: var(--bg-deeper);
-  border-radius: var(--radius-card);
-  padding: 1rem;
-  box-shadow: var(--shadow-ambient);
 }
 
 .sr-only {

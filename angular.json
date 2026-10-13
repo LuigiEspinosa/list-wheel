@@ -25,7 +25,6 @@
             "styles": [
               "src/styles/cuatro-contracts/tokens.css",
               "src/styles/cuatro-contracts/fonts.css",
-              "src/styles/tokens.css",
               "src/styles.css"
             ]
           },
@@ -83,7 +82,6 @@
             "styles": [
               "src/styles/cuatro-contracts/tokens.css",
               "src/styles/cuatro-contracts/fonts.css",
-              "src/styles/tokens.css",
               "src/styles.css"
             ]
           }

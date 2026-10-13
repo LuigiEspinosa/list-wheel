@@ -1,162 +1,57 @@
-.toolbar {
+.toolbar,
+.buttons-row {
   display: flex;
-  gap: 0.75rem;
-  align-items: center;
   flex-wrap: wrap;
-}
-
-.toolbar button,
-.buttons-row button,
-.buttons-row .link-btn {
-  font-family: var(--font-ui);
-  font-size: var(--fs-button);
-  font-weight: 500;
-  letter-spacing: var(--ls-caps);
-  text-transform: uppercase;
-  padding: 0.5rem 0.9rem;
-  border-radius: var(--radius-rounded);
-  border: 1px solid var(--color-purple-muted-border);
-  background: var(--color-purple-muted);
-  color: var(--text-primary);
-  text-decoration: none;
-  box-shadow: var(--shadow-inset);
-  cursor: pointer;
-  transition:
-    box-shadow 120ms ease,
-    background-color 120ms ease,
-    color 120ms ease;
-}
-
-.toolbar button:hover:not(:disabled),
-.buttons-row button:hover:not(:disabled),
-.buttons-row .link-btn:hover:not(:disabled) {
-  box-shadow: var(--shadow-prominent);
-}
-
-.toolbar button:disabled,
-.buttons-row button:disabled,
-.buttons-row .link-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.toolbar button.spin {
-  background: var(--text-primary);
-  color: var(--bg-primary);
-  border-color: var(--text-primary);
-  border-radius: var(--radius-button);
-  box-shadow: var(--shadow-surface);
-}
-
-.toolbar button.spin:hover:not(:disabled) {
-  background: var(--color-purple);
-  color: var(--text-primary);
-  border-color: var(--color-purple);
-}
-
-.toolbar button.spin:focus-visible {
-  background: var(--color-coral);
-  color: var(--bg-primary);
-}
-
-.toolbar input[type='file'] {
-  font-family: var(--font-ui);
-  font-size: var(--fs-button);
-  color: var(--text-primary);
-  background: transparent;
-  border: 1px solid var(--color-purple-muted-border);
-  border-radius: var(--radius-button);
-  padding: 0.35rem 0.5rem;
-}
-
-.toolbar input[type='file']::file-selector-button {
-  font-family: var(--font-ui);
-  font-size: var(--fs-button);
-  font-weight: 500;
-  letter-spacing: var(--ls-caps);
-  text-transform: uppercase;
-  padding: 0.5rem 0.9rem;
-  border-radius: var(--radius-rounded);
-  border: 1px solid var(--color-purple-muted-border);
-  background: var(--color-purple-muted);
-  color: var(--text-primary);
-  box-shadow: var(--shadow-inset);
-  cursor: pointer;
-  margin-right: 0.75rem;
+  align-items: center;
+  gap: var(--s-lg);
 }
 
 .fallback-note {
-  font-size: var(--fs-button);
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: var(--ls-caps);
+  color: var(--token-text-secondary);
+  font-size: var(--t-sm);
 }
 
 .count {
-  font-family: var(--font-mono);
-  font-size: var(--fs-nav);
-  color: var(--text-secondary);
+  color: var(--token-text-secondary);
+  font-family: var(--f-mono);
+  font-size: var(--t-2xs);
+  letter-spacing: var(--tr-meta);
   text-transform: uppercase;
-  letter-spacing: var(--ls-caps);
-}
-
-.instant-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: var(--font-ui);
-  font-size: var(--fs-button);
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: var(--ls-caps);
-  cursor: pointer;
-}
-
-.instant-toggle input[type='checkbox']:not(:disabled) {
-  cursor: pointer;
-}
-
-.instant-toggle:has(input:disabled) {
-  opacity: 0.5;
-  cursor: not-allowed;
+  font-variant-numeric: tabular-nums;
 }
 
 .results {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 1rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--bg-border);
+  gap: var(--s-md);
+  padding-top: var(--s-md);
+  border-top: var(--stroke-hair) solid var(--token-border);
 }
 
-.buttons-row {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-  flex-wrap: wrap;
+.buttons-row span {
+  color: var(--token-text-secondary);
 }
 
 .buttons-row strong {
-  font-family: var(--font-mono);
-  color: var(--color-lime);
+  color: var(--token-text);
+  font-family: var(--f-display);
+  font-stretch: 85%;
+  font-weight: var(--w-bold);
 }
 
 .toast {
-  color: var(--color-lime);
-  font-weight: 600;
-  font-size: var(--fs-button);
+  font-family: var(--f-mono);
+  font-size: var(--t-2xs);
+  letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  letter-spacing: var(--ls-caps);
 }
 
+.buttons-row .toast {
+  color: var(--token-text);
+}
+
+/* Dense data UI is seam S-6: only the separator, the label and tabular-nums bind. */
 .history {
-  margin-top: 0.5rem;
-  background: var(--bg-deeper);
-  border: 1px solid var(--bg-border);
-  border-radius: var(--radius-card);
-  padding: 0.75rem 1rem;
   max-height: 320px;
   overflow-y: auto;
 }
@@ -164,24 +59,29 @@
 .history table {
   width: 100%;
   border-collapse: collapse;
-  font-size: var(--fs-button);
+}
+
+.history th,
+.history td {
+  padding: var(--s-xs) var(--s-sm) var(--s-xs) 0;
+  border-bottom: var(--stroke-hair) solid var(--token-border);
+  text-align: start;
+  font-variant-numeric: tabular-nums;
 }
 
 .history th {
-  text-align: left;
-  padding: 0.25rem 0.5rem;
+  color: var(--token-text-secondary);
+  font-family: var(--f-mono);
+  font-size: var(--t-3xs);
+  font-weight: var(--w-regular);
+  letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  letter-spacing: var(--ls-caps);
-  font-weight: 500;
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--bg-border);
 }
 
 .history td {
-  padding: 0.35rem 0.5rem;
-  border-bottom: 1px solid var(--bg-border);
-  font-family: var(--font-mono);
-  color: var(--text-primary);
+  color: var(--token-text);
+  font-family: var(--f-mono);
+  font-size: var(--t-2xs);
 }
 
 .history tr:last-child td {
@@ -192,14 +92,11 @@
   min-width: 120px;
 }
 
+/* S-4: the message is text in --token-text, on a boundary, never colour alone. */
 .banner {
-  padding: 0.5rem 0.75rem;
-  border-radius: var(--radius-button);
-  background: var(--glass-dark);
-  border: 1px solid var(--color-pink);
-  color: var(--color-coral);
-  font-size: var(--fs-button);
-  text-transform: uppercase;
-  letter-spacing: var(--ls-caps);
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--s-sm);
+  padding: var(--s-xs) var(--s-sm);
+  border: var(--stroke-boundary) solid var(--token-border-interactive);
+  color: var(--token-text);
+  font-size: var(--t-sm);
 }

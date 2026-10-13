@@ -5,6 +5,7 @@
 ### Changed
 
 - Adopts the Cuatro Ecosystem token contract v2.0.0: `src/styles/cuatro-contracts/` is a byte-identical copy of the nine published contract files, loaded ahead of the application's styles, and the three faces (Bricolage Grotesque, Geist, Geist Mono) come from its own woff2 files. The Google Fonts stylesheet and Rubik are gone. `color-scheme: dark`, the accent `::selection`, the contract's focus ring and square form controls are set globally.
+- Restyled to the Cuatro component vocabulary (cuatro-portfolio `RESTYLE-SPEC.md`), presentation only: every button and button-styled link is an unfilled, square control at least 44 by 44 px whose border alone changes on hover; fields are square on the page ground; the glass panel, the wheel's box, every shadow, gradient, alpha colour and opacity fade are gone; sections are separated by 1px hairlines; the wheel's colours are the contract's roles, its spokes and rim 1px at any size. `src/styles/tokens.css` is deleted and `src/app/restyle.spec.ts` holds the floor against the rendered page. Behaviour, routes, data, DOM order and every string are unchanged.
 
 ## [2026-09-25]
 

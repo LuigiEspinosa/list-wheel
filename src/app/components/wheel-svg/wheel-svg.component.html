@@ -1,18 +1,18 @@
 <div class="wheel-wrap">
   <svg class="wheel" viewBox="-50 -50 100 100" role="img" aria-label="Wheel of entries">
     <g [attr.transform]="'rotate(' + angleDeg() + ')'">
-      <circle r="48" fill="#2a1f47"></circle>
-      <circle r="40" fill="#1f1633"></circle>
+      <circle class="wheel__band" r="48"></circle>
+      <circle class="wheel__face" r="40"></circle>
 
-      <g stroke="#362d59" stroke-width="0.2">
+      <g class="wheel__spokes">
         @for (i of labelIndices(); track i; let idx = $index) {
         <line [attr.x1]="0" [attr.y1]="0" [attr.x2]="48 * Math.cos(i * step())" [attr.y2]="48 * Math.sin(i * step())" />
         }
       </g>
 
-      <circle r="48" fill="none" stroke="#6a5fc1" stroke-width="0.8"></circle>
+      <circle class="wheel__rim" r="48"></circle>
 
-      <g fill="#ffffff" font-family="Rubik, system-ui, sans-serif" dominant-baseline="middle">
+      <g class="wheel__labels" dominant-baseline="middle">
         @for (i of labelIndices(); track i; let idx = $index) {
         <g [attr.transform]="'rotate(' + ((i + 0.5) * step() * 180/Math.PI) + ') translate(' + rStart + ' 0)'">
           <text text-anchor="start" [attr.font-size]="labelFontSize(step())">
@@ -23,8 +23,8 @@
       </g>
     </g>
 
-    <polygon points="-3,-49 0,-44 3,-49" fill="#c2ef4e" />
-    <circle r="3" fill="#422082"></circle>
+    <polygon class="wheel__pointer" points="-3,-49 0,-44 3,-49" />
+    <circle class="wheel__hub" r="3"></circle>
 
     @if (svc.lastWinner()) {
     <foreignObject x="-30" y="-16" width="60" height="32" class="winner-fo">
