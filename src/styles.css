@@ -107,10 +107,13 @@ textarea {
   line-height: var(--lh-body);
 }
 
-/* I-11: a field's focus ring takes no radius, so the bare textarea is not
-   rounded by the :focus-visible rule's --r-hair while it holds focus. */
-input[type='text']:focus-visible,
-textarea:focus-visible {
+/* I-11 (RESTYLE-SPEC.md § 4, § 9): a field's focus ring takes no radius. Stated at
+   the focused state for every field, so no field stays square only by out-ranking
+   the :focus-visible rule's --r-hair. The file input is left out until the Operator
+   rules whether it is a § 9 field (§ Open for the Operator, Q-2). */
+input:not([type='file']):focus-visible,
+textarea:focus-visible,
+select:focus-visible {
   border-radius: var(--r-none);
 }
 
