@@ -3,7 +3,7 @@
   place-items: center;
   width: 100%;
   height: 100%;
-  color: var(--text-primary);
+  color: var(--token-text);
 }
 .wheel-wrap {
   width: 100%;
@@ -16,14 +16,47 @@ svg.wheel {
   display: block;
 }
 
+/* The wheel's colours are roles. Depth is lightness (the band one step above
+   the face); the spokes and the rim are 1px rules at any size. */
+.wheel__band {
+  fill: var(--token-bg-raised);
+}
+.wheel__face {
+  fill: var(--token-bg);
+}
+.wheel__spokes line,
+.wheel__rim {
+  vector-effect: non-scaling-stroke;
+  stroke-width: var(--stroke-hair);
+}
+.wheel__spokes {
+  stroke: var(--token-border);
+}
+.wheel__rim {
+  fill: none;
+  stroke: var(--token-border-interactive);
+}
+.wheel__labels {
+  fill: var(--token-text);
+  font-family: var(--f-body);
+}
+.wheel__pointer {
+  fill: var(--token-text);
+}
+.wheel__hub {
+  fill: var(--token-border-interactive);
+}
+
 .winner-fo {
   overflow: visible;
 }
 
+/* Opaque, square, on a boundary. Its lengths are the wheel's own units, so it
+   scales with the wheel. */
 .winner-badge {
-  background: rgba(21, 15, 35, 0.94);
-  border: 0.4px solid #6a5fc1;
-  border-radius: 1.5px;
+  background: var(--token-bg);
+  border: 0.4px solid var(--token-border-interactive);
+  border-radius: var(--r-none);
   padding: 2px 3px;
   box-sizing: border-box;
   width: 100%;
@@ -34,23 +67,26 @@ svg.wheel {
   justify-content: center;
   gap: 1px;
   text-align: center;
-  font-family: Rubik, system-ui, sans-serif;
-  color: #ffffff;
+  font-family: var(--f-body);
+  color: var(--token-text);
   overflow: hidden;
 }
 
 .winner-badge__label {
-  color: #c2ef4e;
+  color: var(--token-text-secondary);
+  font-family: var(--f-mono);
   font-size: 2.4px;
-  font-weight: 600;
+  font-weight: var(--w-regular);
   line-height: 1;
   text-transform: uppercase;
-  letter-spacing: 0.2px;
+  letter-spacing: var(--tr-label);
 }
 
 .winner-badge__name {
-  color: #ffffff;
-  font-weight: 700;
+  color: var(--token-text);
+  font-family: var(--f-display);
+  font-stretch: 85%;
+  font-weight: var(--w-bold);
   line-height: 1.15;
   max-width: 100%;
   word-break: break-word;
