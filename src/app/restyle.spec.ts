@@ -58,4 +58,16 @@ describe('Cuatro restyle', () => {
       expect(el.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
     }
   });
+
+  it('keeps every field square while it holds focus (I-11)', () => {
+    const root = render(true);
+    const fields = [...root.querySelectorAll<HTMLElement>('input[type="text"], textarea')];
+    expect(fields.length).toBe(3);
+    for (const el of fields) {
+      el.focus();
+      const label = el.getAttribute('aria-label') || el.tagName;
+      expect(el.matches(':focus-visible')).withContext(`${label} focus-visible`).toBeTrue();
+      expect(getComputedStyle(el).borderTopLeftRadius).withContext(`${label} radius`).toBe('0px');
+    }
+  });
 });
